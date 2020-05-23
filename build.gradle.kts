@@ -1,6 +1,6 @@
 plugins {
-    id "com.gradle.plugin-publish" version "0.11.0"
-    id "java-gradle-plugin"
+    id("com.gradle.plugin-publish") version "0.11.0"
+    `kotlin-dsl`
     // Apply other plugins here, e.g. the kotlin plugin for a plugin written in Kotlin
     // or the groovy plugin if the plugin uses Groovy
 }
@@ -10,27 +10,37 @@ plugins {
 // so you should probably use JCenter for dependency resolution in your own
 // project.
 repositories {
+    google()
     jcenter()
 }
 
 // Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
 gradlePlugin {
     plugins {
-        greetingsPlugin {
-            id = 'com.rs.android.greeting'
-            implementationClass = 'com.rs.android.GreetingPlugin'
+        create("applicationPlugin") {
+            id = "com.rs.android.application"
+            implementationClass = "com.rs.android.plugins.ModuleApplicationPlugin"
+        }
+        create("featurePlugin") {
+            id = "com.rs.android.feature"
+            implementationClass = "com.rs.android.plugins.ModuleFeaturePlugin"
+        }
+        create("libraryPlugin") {
+            id = "com.rs.android.library"
+            implementationClass = "com.rs.android.plugins.ModuleLibraryPlugin"
         }
     }
 }
 
+
 pluginBundle {
     // These settings are set for the whole plugin bundle
-    website = 'https://github.com/raxden/android-plugins'
-    vcsUrl = 'https://github.com/raxden/android-plugins.git'
+    website = "https://github.com/raxden/android-plugins"
+    vcsUrl = "https://github.com/raxden/android-plugins.git"
 
     // tags and description can be set for the whole bundle here, but can also
     // be set / overridden in the config for specific plugins
-    description = 'Greetings from here!'
+    description = "Allow to include basic configuration for commons modules in Android."
 
     // The plugins block can contain multiple plugin entries.
     //
@@ -47,12 +57,24 @@ pluginBundle {
     // pluginBundle block will be used, but they must be set in one of the
     // two places.
 
-    plugins {
-        greetingsPlugin {
+    (plugins) {
+        "applicationPlugin" {
             // id is captured from java-gradle-plugin configuration
-            displayName = 'Gradle Greeting plugin'
-            tags = ['greetings', 'salutations']
-            version = '0.1'
+            displayName = "Gradle Application plugin"
+            tags = listOf("android")
+            version = "0.1"
+        }
+        "featurePlugin" {
+            // id is captured from java-gradle-plugin configuration
+            displayName = "Gradle Feature plugin"
+            tags = listOf("android")
+            version = "0.1"
+        }
+        "libraryPlugin" {
+            // id is captured from java-gradle-plugin configuration
+            displayName = "Gradle Library plugin"
+            tags = listOf("android")
+            version = "0.1"
         }
     }
 
@@ -70,8 +92,20 @@ pluginBundle {
     // defaults to the project version, which would normally be sufficient.
 
     mavenCoordinates {
-        groupId = "com.rs.android.override"
-        artifactId = "greeting-plugins"
+        groupId = "com.raxdenstudios"
+        artifactId = "android-plugins"
         version = "0.1"
     }
+}
+
+dependencies {
+    /* Depend on the android gradle plugin, since we want to access it in our plugin */
+    implementation("com.android.tools.build:gradle:4.0.0-rc01")
+
+    /* Depend on the kotlin plugin, since we want to access it in our plugin */
+    implementation(kotlin("gradle-plugin", version = "1.3.72"))
+
+    /* Depend on the default Gradle API's since we want to build a custom plugin */
+    implementation(gradleApi())
+    implementation(localGroovy())
 }
