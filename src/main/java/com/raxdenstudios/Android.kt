@@ -1,4 +1,4 @@
-package com.rs.android
+package com.raxdenstudios
 
 import Versions
 import com.android.build.gradle.BaseExtension

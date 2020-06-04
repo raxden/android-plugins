@@ -18,16 +18,16 @@ repositories {
 gradlePlugin {
     plugins {
         create("applicationPlugin") {
-            id = "com.rs.android.application"
-            implementationClass = "com.rs.android.plugins.ModuleApplicationPlugin"
+            id = "com.raxdenstudios.android-application"
+            implementationClass = "com.raxdenstudios.ModuleApplicationPlugin"
         }
         create("featurePlugin") {
-            id = "com.rs.android.feature"
-            implementationClass = "com.rs.android.plugins.ModuleFeaturePlugin"
+            id = "com.raxdenstudios.android-feature"
+            implementationClass = "com.raxdenstudios.ModuleFeaturePlugin"
         }
         create("libraryPlugin") {
-            id = "com.rs.android.library"
-            implementationClass = "com.rs.android.plugins.ModuleLibraryPlugin"
+            id = "com.raxdenstudios.android-library"
+            implementationClass = "com.raxdenstudios.ModuleLibraryPlugin"
         }
     }
 }

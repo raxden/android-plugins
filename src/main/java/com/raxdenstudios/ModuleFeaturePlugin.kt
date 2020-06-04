@@ -1,8 +1,5 @@
-package com.rs.android.plugins
+package com.raxdenstudios
 
-import com.rs.android.Module
-import com.rs.android.configurePlugins
-import com.rs.android.configureAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
