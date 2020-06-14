@@ -1,6 +1,5 @@
 package com.raxdenstudios
 
-import Versions
 import com.android.build.gradle.BaseExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
@@ -33,7 +32,7 @@ fun Project.configurePlugins(module: Module) {
 fun Project.configureAndroid(module: Module) {
   extensions.getByType<BaseExtension>().run {
 
-    compileSdkVersion(Versions.compileSdk)
+    compileSdkVersion(29)
 
     compileOptions(module)
     defaultConfig(module)
@@ -53,15 +52,15 @@ private fun BaseExtension.compileOptions(module: Module) {
 private fun BaseExtension.defaultConfig(module: Module) = when (module) {
   is Module.App ->
     defaultConfig {
-      minSdkVersion(Versions.minSdk)
-      targetSdkVersion(Versions.targetSdk)
+      minSdkVersion(21)
+      targetSdkVersion(29)
 
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
   is Module.Library, is Module.Feature ->
     defaultConfig {
-      minSdkVersion(Versions.minSdk)
-      targetSdkVersion(Versions.targetSdk)
+      minSdkVersion(21)
+      targetSdkVersion(29)
 
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
       consumerProguardFile("consumer-rules.pro")
