@@ -9,6 +9,7 @@ sealed class Module {
 
   object App : Module()
   object Library : Module()
+  object Component: Module()
   object Feature : Module()
 }
 
@@ -57,7 +58,7 @@ private fun BaseExtension.defaultConfig(module: Module) = when (module) {
 
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-  is Module.Library, is Module.Feature ->
+  is Module.Library, is Module.Feature, is Module.Component ->
     defaultConfig {
       minSdkVersion(21)
       targetSdkVersion(29)
@@ -82,7 +83,7 @@ private fun BaseExtension.buildTypes(module: Module) = when (module) {
         )
       }
     }
-  is Module.Library, is Module.Feature ->
+  is Module.Library, is Module.Feature, is Module.Component ->
     buildTypes {
       getByName("debug") {
         isMinifyEnabled = false
@@ -95,10 +96,12 @@ private fun BaseExtension.packagingOptions(module: Module) = when (module) {
     packagingOptions {
       exclude("META-INF/*.kotlin_module")
     }
-  is Module.Library, is Module.Feature ->
+  is Module.Library, is Module.Feature, is Module.Component ->
     packagingOptions {}
 }
 
 private fun BaseExtension.buildFeatures(module: Module) {
-  buildFeatures.dataBinding = true
+  when (module) {
+    is Module.App, is Module.Feature, is Module.Component -> buildFeatures.dataBinding = true
+  }
 }
