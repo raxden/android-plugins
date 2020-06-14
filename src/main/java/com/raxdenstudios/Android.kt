@@ -21,7 +21,7 @@ fun Project.configurePlugins(module: Module) {
       plugins.apply("kotlin-kapt")
       plugins.apply("kotlin-android-extensions")
     }
-    is Module.Library, is Module.Feature -> {
+    is Module.Library, is Module.Feature, is Module.Component -> {
       plugins.apply("com.android.library")
       plugins.apply("kotlin-android")
       plugins.apply("kotlin-kapt")
