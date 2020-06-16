@@ -102,6 +102,9 @@ private fun BaseExtension.packagingOptions(module: Module) = when (module) {
 
 private fun BaseExtension.buildFeatures(module: Module) {
   when (module) {
-    is Module.App, is Module.Feature, is Module.Component -> buildFeatures.dataBinding = true
+    is Module.App, is Module.Feature, is Module.Component -> {
+      buildFeatures.viewBinding = true
+      buildFeatures.dataBinding = true
+    }
   }
 }
