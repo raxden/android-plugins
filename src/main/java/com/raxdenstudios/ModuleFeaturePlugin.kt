@@ -6,7 +6,7 @@ import org.gradle.api.Project
 open class ModuleFeaturePlugin : Plugin<Project> {
   override fun apply(project: Project) {
 
-    val module = Module.Library
+    val module = Module.Feature
     project.configurePlugins(module)
     project.configureAndroid(module)
   }
