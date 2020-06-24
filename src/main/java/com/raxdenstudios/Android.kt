@@ -40,6 +40,7 @@ fun Project.configureAndroid(module: Module) {
     buildTypes(module)
     packagingOptions(module)
     buildFeatures(module)
+    testOptions(module)
   }
 }
 
@@ -92,12 +93,10 @@ private fun BaseExtension.buildTypes(module: Module) = when (module) {
 }
 
 private fun BaseExtension.packagingOptions(module: Module) = when (module) {
-  is Module.App ->
+  is Module.App, is Module.Feature, is Module.Library, is Module.Component ->
     packagingOptions {
       exclude("META-INF/*.kotlin_module")
     }
-  is Module.Library, is Module.Feature, is Module.Component ->
-    packagingOptions {}
 }
 
 private fun BaseExtension.buildFeatures(module: Module) {
@@ -105,6 +104,17 @@ private fun BaseExtension.buildFeatures(module: Module) {
     is Module.App, is Module.Feature, is Module.Component -> {
       buildFeatures.viewBinding = true
       buildFeatures.dataBinding = true
+    }
+  }
+}
+
+private fun BaseExtension.testOptions(module: Module) {
+  when (module) {
+    is Module.App, is Module.Feature, is Module.Component -> {
+      testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.isReturnDefaultValues = true
+      }
     }
   }
 }

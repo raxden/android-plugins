@@ -66,25 +66,25 @@ pluginBundle {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Application plugin"
             tags = listOf("android")
-            version = "0.8"
+            version = "0.11"
         }
         "featurePlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Feature plugin"
             tags = listOf("android")
-            version = "0.8"
+            version = "0.11"
         }
         "libraryPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Library plugin"
             tags = listOf("android")
-            version = "0.8"
+            version = "0.11"
         }
         "componentPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Component plugin"
             tags = listOf("android")
-            version = "0.8"
+            version = "0.11"
         }
     }
 
@@ -104,9 +104,11 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.8"
+        version = "0.11"
     }
 }
+
+// to publish -> gradlew publishPlugins
 
 dependencies {
     /* Depend on the android gradle plugin, since we want to access it in our plugin */
