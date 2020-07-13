@@ -33,6 +33,10 @@ gradlePlugin {
             id = "com.raxdenstudios.android-component"
             implementationClass = "com.raxdenstudios.ModuleComponentPlugin"
         }
+        create("publishPlugin") {
+            id = "com.raxdenstudios.android-publish"
+            implementationClass = "com.raxdenstudios.publish.PublishMavenCentralPlugin"
+        }        
     }
 }
 
@@ -66,26 +70,32 @@ pluginBundle {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Application plugin"
             tags = listOf("android")
-            version = "0.11"
+            version = "0.14"
         }
         "featurePlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Feature plugin"
             tags = listOf("android")
-            version = "0.11"
+            version = "0.14"
         }
         "libraryPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Library plugin"
             tags = listOf("android")
-            version = "0.11"
+            version = "0.14"
         }
         "componentPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Component plugin"
             tags = listOf("android")
-            version = "0.11"
+            version = "0.14"
         }
+        "publishPlugin" {
+            // id is captured from java-gradle-plugin configuration
+            displayName = "Gradle Publish plugin"
+            tags = listOf("android")
+            version = "0.14"
+        }        
     }
 
     // Optional overrides for Maven coordinates.
@@ -104,7 +114,7 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.11"
+        version = "0.14"
     }
 }
 
