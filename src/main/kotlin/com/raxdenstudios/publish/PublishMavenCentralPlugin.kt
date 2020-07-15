@@ -65,8 +65,8 @@ open class PublishMavenCentralPlugin : Plugin<Project> {
             url = uri(repositoryToDeploy)
 
             credentials {
-              username = System.getenv("ossrh.username") ?: project.properties["ossrh.username"] as String
-              password = System.getenv("ossrh.password") ?: project.properties["ossrh.password"] as String
+              username = System.getenv("OSSRH_USERNAME") ?: project.properties["OSSRH_USERNAME"] as String
+              password = System.getenv("OSSRH_PASSWORD") ?: project.properties["OSSRH_PASSWORD"] as String
             }
           }
         }
@@ -81,6 +81,10 @@ open class PublishMavenCentralPlugin : Plugin<Project> {
 
   private fun Project.configureSigning() {
     signing {
+      val signingKeyId = System.getenv("SIGNING_KEY_ID") ?: project.properties["SIGNING_KEY_ID"] as String
+      val signingKey = System.getenv("SIGNING_KEY") ?: project.properties["SIGNING_KEY"] as String
+      val signingPassword = System.getenv("SIGNING_PASSWORD") ?: project.properties["SIGNING_PASSWORD"] as String
+      useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
       sign(publishing.publications)
     }
   }
