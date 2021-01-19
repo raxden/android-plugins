@@ -36,7 +36,11 @@ gradlePlugin {
         create("publishPlugin") {
             id = "com.raxdenstudios.android-publish"
             implementationClass = "com.raxdenstudios.publish.PublishMavenCentralPlugin"
-        }        
+        }
+        create("versioningPlugin") {
+            id = "com.raxdenstudios.android-versioning"
+            implementationClass = "com.raxdenstudios.versioning.AppVersionPlugin"
+        }
     }
 }
 
@@ -70,32 +74,38 @@ pluginBundle {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Application plugin"
             tags = listOf("android")
-            version = "0.16"
+            version = "0.17"
         }
         "featurePlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Feature plugin"
             tags = listOf("android")
-            version = "0.16"
+            version = "0.17"
         }
         "libraryPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Library plugin"
             tags = listOf("android")
-            version = "0.16"
+            version = "0.17"
         }
         "componentPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Component plugin"
             tags = listOf("android")
-            version = "0.16"
+            version = "0.17"
         }
         "publishPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Publish plugin"
             tags = listOf("android")
-            version = "0.16"
-        }        
+            version = "0.17"
+        }
+        "versioningPlugin" {
+            // id is captured from java-gradle-plugin configuration
+            displayName = "Gradle Versioning plugin"
+            tags = listOf("android")
+            version = "0.17"
+        }
     }
 
     // Optional overrides for Maven coordinates.
@@ -114,7 +124,7 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.16"
+        version = "0.17"
     }
 }
 
@@ -122,10 +132,11 @@ pluginBundle {
 
 dependencies {
     /* Depend on the android gradle plugin, since we want to access it in our plugin */
-    implementation("com.android.tools.build:gradle:4.0.0")
+    implementation("com.android.tools.build:gradle:4.1.1")
+    implementation("org.ajoberstar.grgit:grgit-gradle:4.1.0")
 
     /* Depend on the kotlin plugin, since we want to access it in our plugin */
-    implementation(kotlin("gradle-plugin", version = "1.3.72"))
+    implementation(kotlin("gradle-plugin", version = "1.4.10"))
 
     /* Depend on the default Gradle API's since we want to build a custom plugin */
     implementation(gradleApi())
