@@ -26,6 +26,7 @@ open class AppVersionPlugin : Plugin<Project> {
 
       pluginManager.withPlugin("com.android.application") { configure() }
       pluginManager.withPlugin("com.android.dynamic-feature") { configure() }
+      pluginManager.withPlugin("com.android.library") { configureLibrary() }
     }
   }
 
@@ -50,6 +51,12 @@ open class AppVersionPlugin : Plugin<Project> {
     extensions.getByType<BaseExtension>().run {
       defaultConfig.versionName = appVersionProvider.versionName
       defaultConfig.versionCode = appVersionProvider.versionCode
+    }
+  }
+
+  private fun Project.configureLibrary() {
+    extensions.getByType<BaseExtension>().run {
+      version = appVersionProvider.versionName
     }
   }
 }
