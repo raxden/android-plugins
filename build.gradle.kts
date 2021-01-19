@@ -17,22 +17,6 @@ repositories {
 // Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
 gradlePlugin {
     plugins {
-        create("applicationPlugin") {
-            id = "com.raxdenstudios.android-application"
-            implementationClass = "com.raxdenstudios.ModuleApplicationPlugin"
-        }
-        create("featurePlugin") {
-            id = "com.raxdenstudios.android-feature"
-            implementationClass = "com.raxdenstudios.ModuleFeaturePlugin"
-        }
-        create("libraryPlugin") {
-            id = "com.raxdenstudios.android-library"
-            implementationClass = "com.raxdenstudios.ModuleLibraryPlugin"
-        }
-        create("componentPlugin") {
-            id = "com.raxdenstudios.android-component"
-            implementationClass = "com.raxdenstudios.ModuleComponentPlugin"
-        }
         create("publishPlugin") {
             id = "com.raxdenstudios.android-publish"
             implementationClass = "com.raxdenstudios.publish.PublishMavenCentralPlugin"
@@ -70,30 +54,6 @@ pluginBundle {
     // two places.
 
     (plugins) {
-        "applicationPlugin" {
-            // id is captured from java-gradle-plugin configuration
-            displayName = "Gradle Application plugin"
-            tags = listOf("android")
-            version = "0.17"
-        }
-        "featurePlugin" {
-            // id is captured from java-gradle-plugin configuration
-            displayName = "Gradle Feature plugin"
-            tags = listOf("android")
-            version = "0.17"
-        }
-        "libraryPlugin" {
-            // id is captured from java-gradle-plugin configuration
-            displayName = "Gradle Library plugin"
-            tags = listOf("android")
-            version = "0.17"
-        }
-        "componentPlugin" {
-            // id is captured from java-gradle-plugin configuration
-            displayName = "Gradle Component plugin"
-            tags = listOf("android")
-            version = "0.17"
-        }
         "publishPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Publish plugin"
