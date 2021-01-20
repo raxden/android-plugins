@@ -58,13 +58,13 @@ pluginBundle {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Publish plugin"
             tags = listOf("android")
-            version = "0.19"
+            version = "0.20"
         }
         "versioningPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Versioning plugin"
             tags = listOf("android")
-            version = "0.19"
+            version = "0.20"
         }
     }
 
@@ -84,7 +84,7 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.19"
+        version = "0.20"
     }
 }
 
