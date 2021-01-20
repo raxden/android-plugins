@@ -37,13 +37,20 @@ class AppVersionProvider(
 
   fun increaseMinorVersion() {
     properties.setProperty("MINOR", minor.inc().toString())
-    val outputStreamWriter = propertiesFile.writer()
-    properties.store(outputStreamWriter, null)
-    outputStreamWriter.close()
+    saveChanges()
+  }
+
+  fun resetPatchVersion() {
+    properties.setProperty("PATCH", "0")
+    saveChanges()
   }
 
   fun increasePatchVersion() {
     properties.setProperty("PATCH", patch.inc().toString())
+    saveChanges()
+  }
+
+  private fun saveChanges() {
     val outputStreamWriter = propertiesFile.writer()
     properties.store(outputStreamWriter, null)
     outputStreamWriter.close()

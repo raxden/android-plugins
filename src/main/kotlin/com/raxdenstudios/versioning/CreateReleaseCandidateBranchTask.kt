@@ -36,6 +36,7 @@ open class CreateReleaseCandidateBranchTask : DefaultTask() {
 
   private fun Grgit.bumpVersion() {
     appVersionProvider.increaseMinorVersion()
+    appVersionProvider.resetPatchVersion()
     add { patterns = mutableSetOf("version.properties") }
     commit { message = commitMessage }
     push()
