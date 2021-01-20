@@ -36,7 +36,7 @@ open class ReleaseCandidateTagTask : DefaultTask() {
 
   private fun Grgit.bumpVersion() {
     appVersionProvider.increasePatchVersion()
-    add { patterns = mutableSetOf(appVersionProvider.getPropertiesFilePath()) }
+    add { patterns = mutableSetOf(".") }
     commit { message = commitMessage }
     push()
   }
