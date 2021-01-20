@@ -35,6 +35,8 @@ class AppVersionProvider(
       else "${major}.${minor}.${patch}"
     }
 
+  fun getPropertiesFilePath() = propertiesFile.absolutePath
+
   fun increaseMinorVersion() {
     properties.setProperty("MINOR", minor.inc().toString())
     saveChanges()
