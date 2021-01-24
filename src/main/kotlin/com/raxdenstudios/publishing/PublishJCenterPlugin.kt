@@ -1,4 +1,4 @@
-package com.raxdenstudios.publish
+package com.raxdenstudios.publishing
 
 import com.android.build.gradle.LibraryExtension
 import com.jfrog.bintray.gradle.BintrayExtension

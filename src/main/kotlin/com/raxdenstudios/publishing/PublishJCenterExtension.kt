@@ -1,4 +1,4 @@
-package com.raxdenstudios.publish
+package com.raxdenstudios.publishing
 
 open class PublishMavenCentralExtension {
   var name = ""
