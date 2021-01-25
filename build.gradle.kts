@@ -17,13 +17,17 @@ repositories {
 // Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
 gradlePlugin {
     plugins {
-        create("versionPlugin") {
-            id = "com.raxdenstudios.android-versioning"
-            implementationClass = "com.raxdenstudios.versioning.AppVersionPlugin"
+        create("appVersionPlugin") {
+            id = "com.raxdenstudios.version-app"
+            implementationClass = "com.raxdenstudios.version.AppVersionPlugin"
+        }
+        create("libraryVersionPlugin") {
+            id = "com.raxdenstudios.version-library"
+            implementationClass = "com.raxdenstudios.version.LibraryVersionPlugin"
         }
         create("publishJCenterPlugin") {
             id = "com.raxdenstudios.android-publishing-jcenter"
-            implementationClass = "com.raxdenstudios.publish.PublishJCenterPlugin"
+            implementationClass = "com.raxdenstudios.publishing.PublishJCenterPlugin"
         }
     }
 }
@@ -54,17 +58,23 @@ pluginBundle {
     // two places.
 
     (plugins) {
-        "versionPlugin" {
+        "appVersionPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Versioning plugin"
             tags = listOf("android")
-            version = "0.27"
+            version = "0.29"
+        }
+        "libraryVersionPlugin" {
+            // id is captured from java-gradle-plugin configuration
+            displayName = "Gradle Versioning plugin"
+            tags = listOf("android")
+            version = "0.29"
         }
         "publishJCenterPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Publish plugin"
             tags = listOf("android")
-            version = "0.27"
+            version = "0.29"
         }
     }
 
@@ -84,7 +94,7 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.27"
+        version = "0.29"
     }
 }
 
@@ -97,7 +107,7 @@ dependencies {
     implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4")
 
     /* Depend on the kotlin plugin, since we want to access it in our plugin */
-    implementation(kotlin("gradle-plugin", version = "1.4.10"))
+    implementation(kotlin("gradle-plugin", version = "1.4.21"))
 
     /* Depend on the default Gradle API's since we want to build a custom plugin */
     implementation(gradleApi())
