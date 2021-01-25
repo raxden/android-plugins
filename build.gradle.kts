@@ -27,7 +27,7 @@ gradlePlugin {
         }
         create("publishJCenterPlugin") {
             id = "com.raxdenstudios.android-publishing-jcenter"
-            implementationClass = "com.raxdenstudios.publishing.PublishJCenterPlugin"
+            implementationClass = "com.raxdenstudios.publish.PublishJCenterPlugin"
         }
     }
 }
