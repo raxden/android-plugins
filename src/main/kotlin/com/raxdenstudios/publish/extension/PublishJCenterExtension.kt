@@ -1,4 +1,6 @@
-package com.raxdenstudios.publishing
+package com.raxdenstudios.publish.extension
+
+import com.raxdenstudios.publish.model.Bintray
 
 open class PublishMavenCentralExtension {
   var name = ""
@@ -10,7 +12,3 @@ open class PublishMavenCentralExtension {
   var bintray: Bintray = Bintray()
 }
 
-class Bintray(
-  var key: String = "",
-  var repository: String = ""
-)
