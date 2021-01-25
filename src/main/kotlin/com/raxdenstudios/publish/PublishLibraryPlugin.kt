@@ -1,8 +1,10 @@
 package com.raxdenstudios.publish
 
+import com.raxdenstudios.publish.provider.PomDataProvider
+import com.raxdenstudios.publish.provider.RepositoryBintrayDataProvider
 import com.android.build.gradle.LibraryExtension
 import com.jfrog.bintray.gradle.BintrayExtension
-import com.raxdenstudios.publish.extension.PublishMavenCentralExtension
+import com.raxdenstudios.publish.extension.PublishLibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
@@ -18,12 +20,12 @@ import java.util.*
 * ./gradlew publishToMavenLocal
 * ./gradlew clean publish bintrayUpload --info
  */
-open class PublishJCenterPlugin : Plugin<Project> {
+open class PublishLibraryPlugin : Plugin<Project> {
 
-  private lateinit var extension: PublishMavenCentralExtension
+  private lateinit var extension: PublishLibraryExtension
 
   override fun apply(project: Project) {
-    extension = project.extensions.create("publishJCenter")
+    extension = project.extensions.create("publishLibrary")
 
     project.configurePlugins()
     project.configurePublish()
@@ -40,8 +42,8 @@ open class PublishJCenterPlugin : Plugin<Project> {
       // Because the components are created only during the afterEvaluate phase, you must
       // configure your publications using the afterEvaluate() lifecycle method.
       afterEvaluate {
-        // Creates a Maven publication called "release".
         publications {
+          // Creates a Maven publication called "release".
           create<MavenPublication>("release") {
             // Applies the component for the release build variant.
             from(components["release"])
@@ -51,7 +53,7 @@ open class PublishJCenterPlugin : Plugin<Project> {
             version = project.version.toString()
 
             configureArtifacts(this@configurePublish)
-            configurePom()
+            configurePom(project)
           }
         }
       }
@@ -59,24 +61,25 @@ open class PublishJCenterPlugin : Plugin<Project> {
   }
 
   private fun Project.configureBintray() {
-    bintray {
-      afterEvaluate {
-        user = extension.username
-        key = extension.bintrayCredentials.key
-        publish = true
+    val provider = RepositoryBintrayDataProvider(this)
+    afterEvaluate {
+      bintray {
+        user = provider.user
+        key = provider.key
+        publish = provider.publish
         setPublications("release")
-        override = true
+        override = provider.override
 
         pkg.apply {
-          repo = extension.bintrayCredentials.repository
-          name = extension.name
-          description = extension.description
+          repo = provider.repo
+          name = provider.name
+          description = provider.description
           desc = description
           publicDownloadNumbers = true
           setLicenses("Apache-2.0")
-          vcsUrl = "${extension.website}.git"
-          websiteUrl = extension.website
-          issueTrackerUrl = "${extension.website}/issues"
+          vcsUrl = provider.vcsUrl
+          websiteUrl = provider.websiteUrl
+          issueTrackerUrl = provider.issueTrackerUrl
           version.apply {
             name = project.version.toString()
             desc = "Version ${project.version}"
@@ -92,29 +95,29 @@ open class PublishJCenterPlugin : Plugin<Project> {
     artifact(project.getAndroidSourcesJar())
   }
 
-  private fun MavenPublication.configurePom() {
+  private fun MavenPublication.configurePom(project: Project) {
+    val provider = PomDataProvider(project)
     pom {
-      name.set(extension.name)
-      description.set(extension.description)
-      url.set(extension.website)
+      name.set(provider.name)
+      description.set(provider.description)
+      url.set(provider.url)
       licenses {
         license {
-          name.set("The Apache License, Version 2.0")
-          url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+          name.set(provider.licenseName)
+          url.set(provider.licenseUrl)
         }
       }
       developers {
         developer {
-          id.set(extension.username)
-          name.set(extension.developerName)
-          email.set(extension.email)
+          id.set(provider.developerId)
+          name.set(provider.developerName)
+          email.set(provider.developerEmail)
         }
       }
       scm {
-        val urlWithoutSchema = extension.website.removePrefix("https://")
-        connection.set("scm:git:$urlWithoutSchema.git")
-        developerConnection.set("scm:git:ssh://$urlWithoutSchema.git")
-        url.set("${extension.website}/tree/master")
+        connection.set(provider.scmConnection)
+        developerConnection.set(provider.scmDeveloperConnection)
+        url.set(provider.scmUrl)
       }
     }
   }
