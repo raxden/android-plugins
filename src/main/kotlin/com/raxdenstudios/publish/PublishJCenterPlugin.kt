@@ -62,13 +62,13 @@ open class PublishJCenterPlugin : Plugin<Project> {
     bintray {
       afterEvaluate {
         user = extension.username
-        key = extension.bintray.key
+        key = extension.bintrayCredentials.key
         publish = true
         setPublications("release")
         override = true
 
         pkg.apply {
-          repo = extension.bintray.repository
+          repo = extension.bintrayCredentials.repository
           name = extension.name
           description = extension.description
           desc = description

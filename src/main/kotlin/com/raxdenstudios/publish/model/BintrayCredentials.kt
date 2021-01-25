@@ -1,6 +1,6 @@
 package com.raxdenstudios.publish.model
 
-class Bintray(
+class BintrayCredentials(
   var key: String = "",
   var repository: String = ""
 )

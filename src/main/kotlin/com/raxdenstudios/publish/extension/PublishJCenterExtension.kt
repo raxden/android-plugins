@@ -1,6 +1,6 @@
 package com.raxdenstudios.publish.extension
 
-import com.raxdenstudios.publish.model.Bintray
+import com.raxdenstudios.publish.model.BintrayCredentials
 
 open class PublishMavenCentralExtension {
   var name = ""
@@ -9,6 +9,6 @@ open class PublishMavenCentralExtension {
   var website = ""
   var developerName = ""
   var email = ""
-  var bintray: Bintray = Bintray()
+  var bintrayCredentials: BintrayCredentials = BintrayCredentials()
 }
 
