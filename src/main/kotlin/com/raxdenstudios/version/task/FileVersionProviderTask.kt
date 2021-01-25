@@ -30,11 +30,4 @@ open class FileVersionProviderTask : DefaultTask() {
   @get:Input
   val versionName: String
     get() = fileVersionProvider.versionName
-
-  @TaskAction
-  fun execute() {
-    fileVersionProvider.increaseMinorVersion()
-    println("versionCode: ${fileVersionProvider.versionCode}")
-    println("versionName: ${fileVersionProvider.versionName}")
-  }
 }
