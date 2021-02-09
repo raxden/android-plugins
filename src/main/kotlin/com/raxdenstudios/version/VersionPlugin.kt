@@ -17,9 +17,15 @@ abstract class VersionPlugin<Extension : VersionExtension> : Plugin<Project> {
   override fun apply(project: Project) {
     extension = project.createExtension()
 
-    project.tasks.register<FileVersionProviderTask>("fileVersionProvider")
-    project.tasks.register<ReleaseCandidateBranchTask>("releaseCandidate")
-    project.tasks.register<ReleaseCandidateTagTask>("releaseCandidateTag")
+//    project.tasks.register<FileVersionProviderTask>("fileVersionProvider") {
+//      group = "versioning"
+//    }
+    project.tasks.register<ReleaseCandidateBranchTask>("releaseCandidate") {
+      group = "versioning"
+    }
+    project.tasks.register<ReleaseCandidateTagTask>("releaseCandidateTag") {
+      group = "versioning"
+    }
 
     project.afterEvaluate {
       fileVersionProvider = FileVersionProvider(project)

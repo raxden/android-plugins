@@ -22,11 +22,9 @@ open class FileVersionProviderTask : DefaultTask() {
   @get:Input
   val dev: Int
     get() = fileVersionProvider.dev
-
   @get:Input
   val versionCode: Int
     get() = fileVersionProvider.versionCode
-
   @get:Input
   val versionName: String
     get() = fileVersionProvider.versionName

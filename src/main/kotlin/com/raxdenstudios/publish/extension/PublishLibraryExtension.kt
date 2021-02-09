@@ -1,15 +1,19 @@
 package com.raxdenstudios.publish.extension
 
+import com.raxdenstudios.publish.model.Coordinates
+import com.raxdenstudios.publish.model.Signing
+import com.raxdenstudios.publish.model.Pom
 import com.raxdenstudios.publish.model.Repository
-import com.raxdenstudios.publish.model.BintrayRepository
 
 open class PublishLibraryExtension {
   var name = ""
   var description = ""
-  var web = ""
-  var username = ""
+  var url = ""
+  var developerId = ""
   var developerName: String = ""
   var developerEmail: String = ""
-  var repository: Repository = BintrayRepository.default
+  var coordinates: Coordinates = Coordinates.default
+  var pom: Pom = Pom.default
+  var repository: Repository = Repository.sonatype
+  var signing: Signing = Signing.default
 }
-
