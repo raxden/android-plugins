@@ -13,17 +13,18 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 
-class VersioningPlugin: Plugin<Project> {
+class VersioningPlugin : Plugin<Project> {
 
   private lateinit var versioningExtension: VersioningExtension
   private lateinit var fileVersionProvider: FileVersionProvider
 
   override fun apply(project: Project) {
+    project.initExtension()
 
     project.registerReleaseCandidateTask()
     project.registerReleaseCandidateTagTask()
 
-    project.configureProject()
+    project.configure()
   }
 
   private fun Project.registerReleaseCandidateTagTask() {
@@ -38,30 +39,38 @@ class VersioningPlugin: Plugin<Project> {
     }
   }
 
-  private fun Project.configureProject() {
-    pluginManager.withPlugin("com.android.application") {
-      versioningExtension = extensions.create<AppVersioningExtension>("versioning")
-      afterEvaluate { configure() }
-    }
-    pluginManager.withPlugin("com.android.library") {
-      versioningExtension = extensions.create<LibraryVersioningExtension>("versioning")
-      afterEvaluate { configure() }
-    }
+  private fun Project.initExtension() {
+    pluginManager.withPlugin("com.android.application") { initAppVersioningExtension() }
+    pluginManager.withPlugin("com.android.library") { initLibraryVersioningExtension() }
+  }
+
+  private fun Project.initLibraryVersioningExtension() {
+    versioningExtension = extensions.create<LibraryVersioningExtension>("versioning")
+  }
+
+  private fun Project.initAppVersioningExtension() {
+    versioningExtension = extensions.create<AppVersioningExtension>("versioning")
   }
 
   private fun Project.configure() {
-    fileVersionProvider = FileVersionProvider(project)
-    extensions.getByType<BaseExtension>().run {
-      when (val extension = versioningExtension) {
-        is AppVersioningExtension -> {
-          defaultConfig.versionName = fileVersionProvider.versionName
-          defaultConfig.versionCode = fileVersionProvider.versionCode
-        }
-        is LibraryVersioningExtension -> {
-          version = fileVersionProvider.versionName
-          group = extension.group
-        }
+    afterEvaluate {
+      fileVersionProvider = FileVersionProvider(this)
+
+      extensions.getByType<BaseExtension>().run {
+        pluginManager.withPlugin("com.android.application") { configureApplication() }
+        pluginManager.withPlugin("com.android.dynamic-feature") { configureApplication() }
+        pluginManager.withPlugin("com.android.library") { configureLibrary() }
       }
     }
+  }
+
+  private fun Project.configureLibrary() {
+    version = fileVersionProvider.versionName
+    group = (versioningExtension as LibraryVersioningExtension).group
+  }
+
+  private fun BaseExtension.configureApplication() {
+    defaultConfig.versionName = fileVersionProvider.versionName
+    defaultConfig.versionCode = fileVersionProvider.versionCode
   }
 }
