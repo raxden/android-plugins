@@ -1,5 +1,5 @@
 package com.raxdenstudios.versioning.extension
 
-open class LibraryVersionExtension : VersionExtension() {
+open class LibraryVersioningExtension : VersioningExtension() {
   var group: String = ""
 }

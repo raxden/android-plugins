@@ -17,13 +17,9 @@ repositories {
 // Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
 gradlePlugin {
     plugins {
-        create("appVersionPlugin") {
-            id = "com.raxdenstudios.version-app"
-            implementationClass = "com.raxdenstudios.versioning.AppVersionPlugin"
-        }
-        create("libraryVersionPlugin") {
-            id = "com.raxdenstudios.version-library"
-            implementationClass = "com.raxdenstudios.versioning.LibraryVersionPlugin"
+        create("versioningPlugin") {
+            id = "com.raxdenstudios.android-versioning"
+            implementationClass = "com.raxdenstudios.versioning.VersioningPlugin"
         }
         create("publishLibraryPlugin") {
             id = "com.raxdenstudios.publish-library"
@@ -62,13 +58,7 @@ pluginBundle {
     // two places.
 
     (plugins) {
-        "appVersionPlugin" {
-            // id is captured from java-gradle-plugin configuration
-            displayName = "Gradle Versioning plugin"
-            tags = listOf("android")
-            version = "0.34"
-        }
-        "libraryVersionPlugin" {
+        "versioningPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Versioning plugin"
             tags = listOf("android")

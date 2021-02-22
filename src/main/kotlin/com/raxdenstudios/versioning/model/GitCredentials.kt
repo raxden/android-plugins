@@ -1,6 +1,6 @@
 package com.raxdenstudios.versioning.model
 
-data class Credentials(
+data class GitCredentials(
   var user: String = "",
   var password: String = ""
 )
