@@ -19,15 +19,19 @@ gradlePlugin {
     plugins {
         create("appVersionPlugin") {
             id = "com.raxdenstudios.version-app"
-            implementationClass = "com.raxdenstudios.version.AppVersionPlugin"
+            implementationClass = "com.raxdenstudios.versioning.AppVersionPlugin"
         }
         create("libraryVersionPlugin") {
             id = "com.raxdenstudios.version-library"
-            implementationClass = "com.raxdenstudios.version.LibraryVersionPlugin"
+            implementationClass = "com.raxdenstudios.versioning.LibraryVersionPlugin"
         }
         create("publishLibraryPlugin") {
             id = "com.raxdenstudios.publish-library"
-            implementationClass = "com.raxdenstudios.publish.PublishLibraryPlugin"
+            implementationClass = "com.raxdenstudios.publishing.PublishLibraryPlugin"
+        }
+        create("jacocoPlugin") {
+            id = "com.raxdenstudios.android-jacoco"
+            implementationClass = "com.raxdenstudios.reporting.JacocoPlugin"
         }
     }
 }
@@ -62,19 +66,25 @@ pluginBundle {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Versioning plugin"
             tags = listOf("android")
-            version = "0.32"
+            version = "0.34"
         }
         "libraryVersionPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Versioning plugin"
             tags = listOf("android")
-            version = "0.32"
+            version = "0.34"
         }
         "publishLibraryPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Publish plugin"
             tags = listOf("android")
-            version = "0.32"
+            version = "0.34"
+        }
+        "jacocoPlugin" {
+            // id is captured from java-gradle-plugin configuration
+            displayName = "Gradle Jacoco plugin"
+            tags = listOf("android")
+            version = "0.34"
         }
     }
 
@@ -94,7 +104,7 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.32"
+        version = "0.34"
     }
 }
 
