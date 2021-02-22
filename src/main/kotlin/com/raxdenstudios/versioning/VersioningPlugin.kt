@@ -41,6 +41,7 @@ class VersioningPlugin : Plugin<Project> {
 
   private fun Project.initExtension() {
     pluginManager.withPlugin("com.android.application") { initAppVersioningExtension() }
+    pluginManager.withPlugin("com.android.dynamic-feature") { initAppVersioningExtension() }
     pluginManager.withPlugin("com.android.library") { initLibraryVersioningExtension() }
   }
 
