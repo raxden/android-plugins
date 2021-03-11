@@ -18,14 +18,14 @@ open class ReleaseCandidateTagTask : AbstractReleaseCandidateTask() {
   }
 
   private fun Grgit.createTagRelease() {
-    tag.add { name = versionName }
+    tag.add { name = getTagName() }
     push { tags = true }
   }
 
   private fun Grgit.bumpVersion() {
     increasePatchVersion()
     add { patterns = mutableSetOf(".") }
-    commit { message = commitMessage }
+    commit { message = getCommitBumpVersionMessage() }
     push()
   }
 }

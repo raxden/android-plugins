@@ -26,12 +26,9 @@ abstract class AbstractReleaseCandidateTask : DefaultTask() {
   }
   private val user: String by lazy { credentialsProvider.user }
   private val password: String by lazy { credentialsProvider.password }
-  @Internal
-  protected val versionName = fileVersionProvider.versionName
+
   @Internal
   protected val releaseBranch = "releases/release-${fileVersionProvider.major}.${fileVersionProvider.minor}"
-  @Internal
-  protected val commitMessage = "Bump version to ${fileVersionProvider.versionName}"
 
   fun openGitWithCredentials(): Grgit = Grgit.open { credentials = Credentials(user, password) }
 
@@ -46,4 +43,10 @@ abstract class AbstractReleaseCandidateTask : DefaultTask() {
   fun increasePatchVersion() {
     fileVersionProvider.increasePatchVersion()
   }
+
+  @Internal
+  fun getTagName() = fileVersionProvider.versionName
+
+  @Internal
+  fun getCommitBumpVersionMessage() = "Bump version to ${fileVersionProvider.versionName}"
 }

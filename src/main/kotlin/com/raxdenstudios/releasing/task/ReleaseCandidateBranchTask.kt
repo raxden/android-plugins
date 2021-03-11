@@ -25,7 +25,7 @@ open class ReleaseCandidateBranchTask : AbstractReleaseCandidateTask() {
     increaseMinorVersion()
     resetPatchVersion()
     add { patterns = mutableSetOf(".") }
-    commit { message = commitMessage }
+    commit { message = getCommitBumpVersionMessage() }
     push()
   }
 }
