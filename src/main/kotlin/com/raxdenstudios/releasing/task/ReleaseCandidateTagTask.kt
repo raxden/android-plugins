@@ -9,7 +9,7 @@ open class ReleaseCandidateTagTask : AbstractReleaseCandidateTask() {
   @TaskAction
   fun execute() {
     openGitWithCredentials().run {
-      checkoutBranch(releaseBranch)
+      checkoutBranch(getReleaseBranch())
       createTagRelease()
       bumpVersion()
       checkoutBranch(MASTER_BRANCH)

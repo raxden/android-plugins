@@ -18,7 +18,7 @@ open class ReleaseCandidateBranchTask : AbstractReleaseCandidateTask() {
 
   private fun Grgit.createReleaseCandidateBranch() = push {
     remote = "origin"
-    refsOrSpecs = listOf("HEAD:refs/heads/$releaseBranch")
+    refsOrSpecs = listOf("HEAD:refs/heads/${getReleaseBranch()}")
   }
 
   private fun Grgit.bumpVersion() {
