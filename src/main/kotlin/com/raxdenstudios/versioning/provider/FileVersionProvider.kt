@@ -1,22 +1,17 @@
 package com.raxdenstudios.versioning.provider
 
 import com.raxdenstudios.getPropertyOrDefault
-import com.raxdenstudios.versioning.extension.VersioningExtension
-import org.gradle.api.Project
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.*
 
 class FileVersionProvider(
-  private val project: Project
+  private val versionFilePath: String
 ) {
 
-  private val extension: VersioningExtension by lazy {
-    project.extensions.getByName("versioning") as VersioningExtension
-  }
   private val properties by lazy {
     Properties().apply {
-      val fileInputStream = FileInputStream(extension.versionFilePath)
+      val fileInputStream = FileInputStream(versionFilePath)
       fileInputStream.use { input -> load(input) }
     }
   }
@@ -49,9 +44,7 @@ class FileVersionProvider(
   }
 
   private fun Properties.saveChanges() {
-    val fileOutputStream = FileOutputStream(extension.versionFilePath)
-    fileOutputStream.use { output ->
-      store(output, null)
-    }
+    val fileOutputStream = FileOutputStream(versionFilePath)
+    fileOutputStream.use { output -> store(output, null) }
   }
 }

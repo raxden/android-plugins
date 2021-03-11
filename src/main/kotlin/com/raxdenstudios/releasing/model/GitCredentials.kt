@@ -1,4 +1,4 @@
-package com.raxdenstudios.versioning.model
+package com.raxdenstudios.releasing.model
 
 data class GitCredentials(
   var user: String = "",

@@ -21,6 +21,10 @@ gradlePlugin {
             id = "com.raxdenstudios.android-versioning"
             implementationClass = "com.raxdenstudios.versioning.VersioningPlugin"
         }
+        create("releasingPlugin") {
+            id = "com.raxdenstudios.android-releasing"
+            implementationClass = "com.raxdenstudios.releasing.ReleasingPlugin"
+        }
         create("publishLibraryPlugin") {
             id = "com.raxdenstudios.publish-library"
             implementationClass = "com.raxdenstudios.publishing.PublishLibraryPlugin"
@@ -62,19 +66,25 @@ pluginBundle {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Versioning plugin"
             tags = listOf("android")
-            version = "0.37"
+            version = "0.39"
+        }
+        "releasingPlugin" {
+            // id is captured from java-gradle-plugin configuration
+            displayName = "Gradle Releasing plugin"
+            tags = listOf("android")
+            version = "0.39"
         }
         "publishLibraryPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Publish plugin"
             tags = listOf("android")
-            version = "0.37"
+            version = "0.39"
         }
         "jacocoPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Jacoco plugin"
             tags = listOf("android")
-            version = "0.37"
+            version = "0.39"
         }
     }
 
@@ -94,7 +104,7 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.37"
+        version = "0.39"
     }
 }
 

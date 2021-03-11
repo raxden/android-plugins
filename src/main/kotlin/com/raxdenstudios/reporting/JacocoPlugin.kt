@@ -17,6 +17,13 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 
 open class JacocoPlugin : Plugin<Project> {
 
+  companion object {
+    private const val GROUP_TASK_NAME = "reporting"
+    private const val APPLICATION_PLUGIN = "com.android.application"
+    private const val DYNAMIC_FEATURE_PLUGIN = "com.android.dynamic-feature"
+    private const val LIBRARY_PLUGIN = "com.android.library"
+  }
+
   private val filters = JacocoFilters()
 
   override fun apply(project: Project) {
@@ -44,9 +51,9 @@ open class JacocoPlugin : Plugin<Project> {
   }
 
   private fun Project.configureProject() {
-    pluginManager.withPlugin("com.android.application") { configureApplication() }
-    pluginManager.withPlugin("com.android.dynamic-feature") { configureApplication() }
-    pluginManager.withPlugin("com.android.library") { configureLibrary() }
+    pluginManager.withPlugin(APPLICATION_PLUGIN) { configureApplication() }
+    pluginManager.withPlugin(DYNAMIC_FEATURE_PLUGIN) { configureApplication() }
+    pluginManager.withPlugin(LIBRARY_PLUGIN) { configureLibrary() }
   }
 
   private fun Project.configureApplication() {
@@ -70,7 +77,7 @@ open class JacocoPlugin : Plugin<Project> {
   private fun Project.createJacocoTestReport(variantName: String) {
     tasks.register("jacocoTestReport${variantName.capitalize()}", JacocoReport::class.java) {
       description = "Generate Jacoco coverage reports after running $variantName tests."
-      group = "reporting"
+      group = GROUP_TASK_NAME
       dependsOn("test${variantName.capitalize()}UnitTest")
 
       setSourceDirectories()
