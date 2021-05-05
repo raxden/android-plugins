@@ -48,5 +48,5 @@ abstract class AbstractReleaseCandidateTask : DefaultTask() {
   fun getTagName() = fileVersionProvider.versionName
 
   @Internal
-  fun getCommitBumpVersionMessage() = "Bump version to ${fileVersionProvider.versionName}"
+  fun getCommitBumpVersionMessage() = "Bump version to ${fileVersionProvider.versionName} [skip ci]"
 }
