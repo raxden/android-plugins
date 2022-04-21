@@ -27,7 +27,10 @@ abstract class AbstractReleaseCandidateTask : DefaultTask() {
   private val user: String by lazy { credentialsProvider.user }
   private val password: String by lazy { credentialsProvider.password }
 
-  fun openGitWithCredentials(): Grgit = Grgit.open { credentials = Credentials(user, password) }
+  fun openGitWithCredentials(): Grgit = Grgit.open {
+    credentials = Credentials(user, password)
+    currentDir = project.rootDir
+  }
 
   fun increaseMinorVersion() {
     fileVersionProvider.increaseMinorVersion()
