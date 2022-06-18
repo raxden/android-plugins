@@ -45,7 +45,7 @@ abstract class AbstractReleaseCandidateTask : DefaultTask() {
   }
 
   @Internal
-  fun getReleaseBranch() = "releases/release-${fileVersionProvider.major}.${fileVersionProvider.minor}"
+  fun getReleaseBranch() = "release/${fileVersionProvider.major}.${fileVersionProvider.minor}"
 
   @Internal
   fun getTagName() = fileVersionProvider.versionName
