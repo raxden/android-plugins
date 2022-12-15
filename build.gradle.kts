@@ -66,25 +66,25 @@ pluginBundle {
       // id is captured from java-gradle-plugin configuration
       displayName = "Gradle Versioning plugin"
       tags = listOf("android")
-      version = "0.45"
+      version = "0.49"
     }
     "releasingPlugin" {
       // id is captured from java-gradle-plugin configuration
       displayName = "Gradle Releasing plugin"
       tags = listOf("android")
-      version = "0.45"
+      version = "0.49"
     }
     "publishLibraryPlugin" {
       // id is captured from java-gradle-plugin configuration
       displayName = "Gradle Publish plugin"
       tags = listOf("android")
-      version = "0.45"
+      version = "0.49"
     }
     "jacocoPlugin" {
       // id is captured from java-gradle-plugin configuration
       displayName = "Gradle Jacoco plugin"
       tags = listOf("android")
-      version = "0.45"
+      version = "0.49"
     }
   }
 
@@ -104,7 +104,7 @@ pluginBundle {
   mavenCoordinates {
     groupId = "com.raxdenstudios"
     artifactId = "android-plugins"
-    version = "0.45"
+    version = "0.49"
   }
 }
 
@@ -114,7 +114,7 @@ dependencies {
   /* Depend on the android gradle plugin, since we want to access it in our plugin */
   implementation("com.android.tools.build:gradle:4.1.1")
   implementation("org.ajoberstar.grgit:grgit-gradle:4.1.0")
-  implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4")
+  implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
 
   /* Depend on the kotlin plugin, since we want to access it in our plugin */
   implementation(kotlin("gradle-plugin", version = "1.4.21"))

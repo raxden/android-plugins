@@ -6,26 +6,26 @@ import org.gradle.api.tasks.TaskAction
 
 open class ReleaseCandidateBranchTask : AbstractReleaseCandidateTask() {
 
-  @TaskAction
-  fun execute() {
-    openGitWithCredentials().run {
-      checkoutBranch(MASTER_BRANCH)
-      bumpVersion()
-      createReleaseCandidateBranch()
-      close()
+    @TaskAction
+    fun execute() {
+        openGitWithCredentials().run {
+            checkoutBranch(MASTER_BRANCH)
+            bumpVersion()
+            createReleaseCandidateBranch()
+            close()
+        }
     }
-  }
 
-  private fun Grgit.createReleaseCandidateBranch() = push {
-    remote = "origin"
-    refsOrSpecs = listOf("HEAD:refs/heads/${getReleaseBranch()}")
-  }
+    private fun Grgit.createReleaseCandidateBranch() = push {
+        remote = "origin"
+        refsOrSpecs = listOf("HEAD:refs/heads/${getReleaseBranch()}")
+    }
 
-  private fun Grgit.bumpVersion() {
-    increaseMinorVersion()
-    resetPatchVersion()
-    add { patterns = mutableSetOf(".") }
-    commit { message = getCommitBumpVersionMessage() }
-    push()
-  }
+    private fun Grgit.bumpVersion() {
+        increaseMinorVersion()
+        resetPatchVersion()
+        add { patterns = mutableSetOf(".") }
+        commit { message = getCommitBumpVersionMessage() }
+        push()
+    }
 }
