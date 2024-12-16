@@ -1,18 +1,15 @@
+import org.gradle.plugin.management.internal.autoapply.AutoAppliedGradleEnterprisePlugin.GROUP
+
 plugins {
     id("com.gradle.plugin-publish") version "0.14.0"
     `kotlin-dsl`
+    `maven-publish`
     // Apply other plugins here, e.g. the kotlin plugin for a plugin written in Kotlin
     // or the groovy plugin if the plugin uses Groovy
 }
 
-// If your plugin has any external java dependencies, Gradle will attempt to
-// download them from JCenter for anyone using the plugins DSL
-// so you should probably use JCenter for dependency resolution in your own
-// project.
-repositories {
-    google()
-    jcenter()
-}
+group = "com.raxdenstudios"
+version = "1.0.0-SNAPSHOT"
 
 // Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
 gradlePlugin {
@@ -21,17 +18,12 @@ gradlePlugin {
             id = "com.raxdenstudios.android-versioning"
             implementationClass = "com.raxdenstudios.versioning.VersioningPlugin"
         }
-        create("releasingPlugin") {
-            id = "com.raxdenstudios.android-releasing"
-            implementationClass = "com.raxdenstudios.releasing.ReleasingPlugin"
-        }
         create("publishLibraryPlugin") {
-            id = "com.raxdenstudios.publish-library"
+            id = "com.raxdenstudios.android-publish-library"
             implementationClass = "com.raxdenstudios.publishing.PublishLibraryPlugin"
         }
     }
 }
-
 
 pluginBundle {
     // These settings are set for the whole plugin bundle
@@ -62,19 +54,13 @@ pluginBundle {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Versioning plugin"
             tags = listOf("android")
-            version = "0.50"
-        }
-        "releasingPlugin" {
-            // id is captured from java-gradle-plugin configuration
-            displayName = "Gradle Releasing plugin"
-            tags = listOf("android")
-            version = "0.50"
+            version = "0.56.4"
         }
         "publishLibraryPlugin" {
             // id is captured from java-gradle-plugin configuration
             displayName = "Gradle Publish plugin"
             tags = listOf("android")
-            version = "0.50"
+            version = "0.56.4"
         }
     }
 
@@ -94,7 +80,7 @@ pluginBundle {
     mavenCoordinates {
         groupId = "com.raxdenstudios"
         artifactId = "android-plugins"
-        version = "0.50"
+        version = "0.56.4"
     }
 }
 
@@ -103,8 +89,6 @@ pluginBundle {
 dependencies {
     /* Depend on the android gradle plugin, since we want to access it in our plugin */
     implementation("com.android.tools.build:gradle:4.1.1")
-    implementation("org.ajoberstar.grgit:grgit-gradle:4.1.0")
-    implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
 
     /* Depend on the kotlin plugin, since we want to access it in our plugin */
     implementation(kotlin("gradle-plugin", version = "1.8.0"))

@@ -1,80 +1,76 @@
 package com.raxdenstudios.versioning
 
 import com.android.build.gradle.BaseExtension
-import com.raxdenstudios.releasing.ReleasingPlugin
-import com.raxdenstudios.versioning.task.FileVersionProviderTask
+import com.raxdenstudios.printInfo
 import com.raxdenstudios.versioning.extension.AppVersioningExtension
 import com.raxdenstudios.versioning.extension.LibraryVersioningExtension
 import com.raxdenstudios.versioning.extension.VersioningExtension
-import com.raxdenstudios.versioning.provider.FileVersionProvider
+import com.raxdenstudios.versioning.task.GetVersionTask
+import com.raxdenstudios.versioning.task.IncreaseDevVersionTask
+import com.raxdenstudios.versioning.task.IncreaseMajorVersionTask
+import com.raxdenstudios.versioning.task.IncreaseMinorVersionTask
+import com.raxdenstudios.versioning.task.IncreasePatchVersionTask
+import com.raxdenstudios.versioning.task.ShowVersionInfoTask
+import com.raxdenstudios.withApplicationPlugin
+import com.raxdenstudios.withDynamicFeaturePlugin
+import com.raxdenstudios.withLibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.register
 
 class VersioningPlugin : Plugin<Project> {
 
-  companion object {
-    private const val EXTENSION_NAME = "versioning"
-    private const val GROUP_TASK_NAME = "versioning"
-    private const val APPLICATION_PLUGIN = "com.android.application"
-    private const val DYNAMIC_FEATURE_PLUGIN = "com.android.dynamic-feature"
-    private const val LIBRARY_PLUGIN = "com.android.library"
-    private const val FILE_VERSION_PROVIDER_TASK_NAME = "fileVersionProviderTask"
-  }
-
-  private lateinit var versioningExtension: VersioningExtension
-  private lateinit var fileVersionProvider: FileVersionProvider
-
-  override fun apply(project: Project) {
-    project.initExtensionAccordingToPluginUsed()
-    project.registerFileVersionProviderTask()
-    project.configure()
-  }
-
-  private fun Project.initExtensionAccordingToPluginUsed() {
-    pluginManager.withPlugin(APPLICATION_PLUGIN) { initAppVersioningExtension() }
-    pluginManager.withPlugin(DYNAMIC_FEATURE_PLUGIN) { initAppVersioningExtension() }
-    pluginManager.withPlugin(LIBRARY_PLUGIN) { initLibraryVersioningExtension() }
-  }
-
-  private fun Project.initLibraryVersioningExtension() {
-    versioningExtension = extensions.create<LibraryVersioningExtension>(EXTENSION_NAME)
-  }
-
-  private fun Project.initAppVersioningExtension() {
-    versioningExtension = extensions.create<AppVersioningExtension>(EXTENSION_NAME)
-  }
-
-  private fun Project.registerFileVersionProviderTask() {
-    tasks.register<FileVersionProviderTask>(FILE_VERSION_PROVIDER_TASK_NAME) {
-      group = GROUP_TASK_NAME
+    companion object {
+        const val EXTENSION_NAME = "versioning"
+        const val GROUP_TASK_NAME = "versioning"
     }
-  }
 
-  private fun Project.configure() {
-    afterEvaluate {
-      initFileVersionProvider()
-      extensions.getByType<BaseExtension>().run {
-        pluginManager.withPlugin(APPLICATION_PLUGIN) { configureApplication() }
-        pluginManager.withPlugin(DYNAMIC_FEATURE_PLUGIN) { configureApplication() }
-        pluginManager.withPlugin(LIBRARY_PLUGIN) { configureLibrary() }
-      }
+    private lateinit var extension: VersioningExtension
+
+    override fun apply(project: Project) = with(project) {
+        initExtension()
+        registerTasks()
+        configure()
     }
-  }
 
-  private fun initFileVersionProvider() {
-    fileVersionProvider = FileVersionProvider(versioningExtension.versionFilePath)
-  }
+    private fun Project.initExtension() {
+        withApplicationPlugin { extension = AppVersioningExtension.create(this) }
+        withDynamicFeaturePlugin { extension = AppVersioningExtension.create(this) }
+        withLibraryPlugin { extension = LibraryVersioningExtension.create(this) }
+    }
 
-  private fun Project.configureLibrary() {
-    version = fileVersionProvider.versionName
-    group = (versioningExtension as LibraryVersioningExtension).group
-  }
+    private fun Project.registerTasks() {
+        ShowVersionInfoTask.register(this)
+        GetVersionTask.register(this)
+        IncreaseMajorVersionTask.register(this)
+        IncreaseMinorVersionTask.register(this)
+        IncreasePatchVersionTask.register(this)
+        IncreaseDevVersionTask.register(this)
+    }
 
-  private fun BaseExtension.configureApplication() {
-    defaultConfig.versionName = fileVersionProvider.versionName
-    defaultConfig.versionCode = fileVersionProvider.versionCode
-  }
+    private fun Project.configure() {
+        afterEvaluate {
+            extensions.getByType<BaseExtension>().run {
+                withApplicationPlugin {
+                    val extension = extension as AppVersioningExtension
+                    defaultConfig.versionName = extension.versionName
+                    defaultConfig.versionCode = extension.versionCode
+                    printInfo("Setting versionName to ${extension.versionName}")
+                    printInfo("Setting versionCode to ${extension.versionCode}")
+                }
+                withDynamicFeaturePlugin {
+                    val extension = extension as AppVersioningExtension
+                    defaultConfig.versionName = extension.versionName
+                    defaultConfig.versionCode = extension.versionCode
+                    printInfo("Setting versionName to ${extension.versionName}")
+                    printInfo("Setting versionCode to ${extension.versionCode}")
+                }
+                withLibraryPlugin {
+                    val extension = extension as LibraryVersioningExtension
+                    version = extension.version
+                    printInfo("Setting library version to ${extension.version}")
+                }
+            }
+        }
+    }
 }

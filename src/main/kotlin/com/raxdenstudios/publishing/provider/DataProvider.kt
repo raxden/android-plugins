@@ -4,10 +4,10 @@ import com.raxdenstudios.publishing.extension.PublishLibraryExtension
 import org.gradle.api.Project
 
 abstract class DataProvider(
-  private val project: Project
+    private val project: Project
 ) {
 
-  protected val extension: PublishLibraryExtension by lazy {
-    project.extensions.getByName("publishLibrary") as PublishLibraryExtension
-  }
+    protected val extension: PublishLibraryExtension by lazy {
+        project.extensions.getByName("publishLibrary") as PublishLibraryExtension
+    }
 }
