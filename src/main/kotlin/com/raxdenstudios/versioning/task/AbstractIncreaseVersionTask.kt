@@ -11,7 +11,7 @@ import org.gradle.api.tasks.TaskAction
 abstract class AbstractIncreaseVersionTask : DefaultTask() {
 
     private val extension: VersioningExtension by lazy {
-        project.extensionByName(VersioningPlugin.EXTENSION_NAME) as VersioningExtension
+        project.extensionByName(VersioningPlugin.EXTENSION_NAME)!!
     }
 
     private val fileVersionProvider: FileVersionProvider by lazy {
@@ -22,8 +22,8 @@ abstract class AbstractIncreaseVersionTask : DefaultTask() {
     fun execute() {
         val oldVersion = fileVersionProvider.toString()
         fileVersionProvider.increaseVersion()
-        val version = fileVersionProvider.toString()
-        printInfo("Increasing the patch version $oldVersion -> $version")
+        val newVersion = fileVersionProvider.toString()
+        printInfo("Increasing the patch version $oldVersion -> $newVersion")
     }
 
     abstract fun FileVersionProvider.increaseVersion()

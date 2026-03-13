@@ -13,7 +13,7 @@ import org.gradle.kotlin.dsl.register
 open class GetVersionTask : DefaultTask() {
 
     private val extension: VersioningExtension by lazy {
-        project.extensionByName(VersioningPlugin.EXTENSION_NAME) as VersioningExtension
+        project.extensionByName(VersioningPlugin.EXTENSION_NAME)!!
     }
 
     @TaskAction

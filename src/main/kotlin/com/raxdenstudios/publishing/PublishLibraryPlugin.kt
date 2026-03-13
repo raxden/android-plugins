@@ -1,44 +1,44 @@
 package com.raxdenstudios.publishing
 
-import com.raxdenstudios.publishing.extension.PublishLibraryExtension
-import com.raxdenstudios.publishing.provider.CoordinatesDataProvider
-import com.raxdenstudios.publishing.provider.PomDataProvider
-import com.raxdenstudios.publishing.provider.RepositoryDataProvider
-import com.raxdenstudios.publishing.provider.SigningDataProvider
+import com.android.build.api.dsl.LibraryExtension
+import com.raxdenstudios.Plugin.MavenPublish
+import com.raxdenstudios.Plugin.Signing
+import com.raxdenstudios.checkLibraryPlugin
+import com.raxdenstudios.getOrCreateExtension
+import com.raxdenstudios.publishing.extension.PublishExtension
+import com.raxdenstudios.publishing.configurer.ArtifactsConfigurer
+import com.raxdenstudios.publishing.configurer.CoordinatesDataConfigurer
+import com.raxdenstudios.publishing.configurer.PomDataConfigurer
+import com.raxdenstudios.publishing.configurer.RepositoryDataConfigurer
+import com.raxdenstudios.publishing.configurer.SigningDataConfigurer
+import com.raxdenstudios.withLibraryPlugin
+import com.raxdenstudios.withMavenPublishPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.get
-import com.raxdenstudios.Plugin.MavenPublish
-import com.raxdenstudios.Plugin.Signing
-import com.raxdenstudios.checkLibraryPlugin
-import com.raxdenstudios.publishing
-import com.raxdenstudios.signing
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
+import org.gradle.plugins.signing.SigningExtension
 
-/*
-* ./gradlew publishToMavenLocal
-* ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-*/
 open class PublishLibraryPlugin : Plugin<Project> {
 
     companion object {
         const val EXTENSION_NAME = "publishLibrary"
+        private const val PUBLICATION_NAME = "release"
+        private const val RELEASE_COMPONENT_NAME = "release"
     }
-
-    private lateinit var extension: PublishLibraryExtension
 
     override fun apply(project: Project) = with(project) {
         checkLibraryPlugin()
-        initPublishLibraryExtension()
         initRequiredPlugins()
-        configurePublishingExtension()
-        configureSigningExtension()
+        initExtension()
+        configure()
     }
 
-    private fun Project.initPublishLibraryExtension() {
-        extension = PublishLibraryExtension.create(this)
+    private fun Project.initExtension() {
+        getOrCreateExtension<PublishExtension>(EXTENSION_NAME)
     }
 
     private fun Project.initRequiredPlugins() = plugins.apply {
@@ -46,41 +46,62 @@ open class PublishLibraryPlugin : Plugin<Project> {
         apply(Signing.id)
     }
 
-    private fun Project.configurePublishingExtension() = publishing {
-        // Because the components are created only during the afterEvaluate phase, you must
-        // configure your publications using the afterEvaluate() lifecycle method.
-        afterEvaluate {
-            publications {
-                // Creates a Maven publication called "release".
-                create<MavenPublication>("release") {
-                    // Applies the component for the release build variant.
-                    from(components["release"])
+    private fun Project.configure() {
+        configureArtifacts()
+        configurePublication()
+        configureSigning()
+    }
 
-                    configureCoordinates(project)
-                    configurePom(project)
-                    configureRepositories(project)
-                }
+    private fun Project.configureArtifacts() {
+        withLibraryPlugin {
+            extensions.configure<LibraryExtension> {
+                configureArtifacts(this@configureArtifacts)
             }
         }
     }
 
-    private fun Project.configureSigningExtension() = signing {
-        val provider = SigningDataProvider(project)
-        provider.configure(this)
+    private fun Project.configurePublication() {
+        withMavenPublishPlugin {
+            val publishingExtension = extensions.getByType<PublishingExtension>()
+            val releaseComponents = components.matching { it.name == RELEASE_COMPONENT_NAME }
+
+            releaseComponents.all {
+                if (PUBLICATION_NAME !in publishingExtension.publications.names) {
+                    publishingExtension.publications.register<MavenPublication>(PUBLICATION_NAME) {
+                        from(this@all)
+
+                        configureCoordinates(this@configurePublication)
+                        configurePom(this@configurePublication)
+                    }
+                }
+            }
+            publishingExtension.configureRepositories(this@configurePublication)
+        }
+    }
+
+    private fun Project.configureSigning() {
+        extensions.configure<SigningExtension> {
+            configureSigning(project)
+        }
+    }
+
+    private fun SigningExtension.configureSigning(project: Project) {
+        SigningDataConfigurer(project, EXTENSION_NAME).configure(this)
     }
 
     private fun MavenPublication.configureCoordinates(project: Project) {
-        val provider = CoordinatesDataProvider(project)
-        provider.configure(this)
+        CoordinatesDataConfigurer(project, EXTENSION_NAME).configure(this)
     }
 
     private fun PublishingExtension.configureRepositories(project: Project) {
-        val provider = RepositoryDataProvider(project)
-        provider.configure(this)
+        RepositoryDataConfigurer(project, EXTENSION_NAME).configure(this)
     }
 
     private fun MavenPublication.configurePom(project: Project) {
-        val provider = PomDataProvider(project)
-        provider.configure(this)
+        PomDataConfigurer(project, EXTENSION_NAME).configure(this)
+    }
+
+    private fun LibraryExtension.configureArtifacts(project: Project) {
+        ArtifactsConfigurer(project, EXTENSION_NAME).configure(this)
     }
 }

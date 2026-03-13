@@ -1,12 +1,12 @@
 package com.raxdenstudios.versioning.extension
 
+import com.raxdenstudios.getOrCreateExtension
 import com.raxdenstudios.versioning.VersioningPlugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.create
 
 open class AppVersioningExtension(
     project: Project
-): VersioningExtension(project) {
+) : VersioningExtension(project) {
 
     val versionName: String
         get() = fileVersionProvider.versionName
@@ -15,7 +15,7 @@ open class AppVersioningExtension(
 
     companion object {
 
-        fun create(project: Project): AppVersioningExtension =
-            project.extensions.create(VersioningPlugin.EXTENSION_NAME)
+        fun getOrCreate(project: Project): AppVersioningExtension =
+            project.getOrCreateExtension(VersioningPlugin.EXTENSION_NAME)
     }
 }

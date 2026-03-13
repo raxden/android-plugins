@@ -1,10 +1,10 @@
 package com.raxdenstudios.versioning
 
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.raxdenstudios.printInfo
 import com.raxdenstudios.versioning.extension.AppVersioningExtension
 import com.raxdenstudios.versioning.extension.LibraryVersioningExtension
-import com.raxdenstudios.versioning.extension.VersioningExtension
 import com.raxdenstudios.versioning.task.GetVersionTask
 import com.raxdenstudios.versioning.task.IncreaseDevVersionTask
 import com.raxdenstudios.versioning.task.IncreaseMajorVersionTask
@@ -13,10 +13,10 @@ import com.raxdenstudios.versioning.task.IncreasePatchVersionTask
 import com.raxdenstudios.versioning.task.ShowVersionInfoTask
 import com.raxdenstudios.withApplicationPlugin
 import com.raxdenstudios.withDynamicFeaturePlugin
+import com.raxdenstudios.withJavaPlatformPlugin
 import com.raxdenstudios.withLibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.getByType
 
 class VersioningPlugin : Plugin<Project> {
 
@@ -25,8 +25,6 @@ class VersioningPlugin : Plugin<Project> {
         const val GROUP_TASK_NAME = "versioning"
     }
 
-    private lateinit var extension: VersioningExtension
-
     override fun apply(project: Project) = with(project) {
         initExtension()
         registerTasks()
@@ -34,9 +32,10 @@ class VersioningPlugin : Plugin<Project> {
     }
 
     private fun Project.initExtension() {
-        withApplicationPlugin { extension = AppVersioningExtension.create(this) }
-        withDynamicFeaturePlugin { extension = AppVersioningExtension.create(this) }
-        withLibraryPlugin { extension = LibraryVersioningExtension.create(this) }
+        withApplicationPlugin { AppVersioningExtension.getOrCreate(this) }
+        withDynamicFeaturePlugin { AppVersioningExtension.getOrCreate(this) }
+        withLibraryPlugin { LibraryVersioningExtension.getOrCreate(this) }
+        withJavaPlatformPlugin { LibraryVersioningExtension.getOrCreate(this) }
     }
 
     private fun Project.registerTasks() {
@@ -49,28 +48,43 @@ class VersioningPlugin : Plugin<Project> {
     }
 
     private fun Project.configure() {
-        afterEvaluate {
-            extensions.getByType<BaseExtension>().run {
-                withApplicationPlugin {
-                    val extension = extension as AppVersioningExtension
-                    defaultConfig.versionName = extension.versionName
-                    defaultConfig.versionCode = extension.versionCode
-                    printInfo("Setting versionName to ${extension.versionName}")
-                    printInfo("Setting versionCode to ${extension.versionCode}")
+        withApplicationPlugin {
+            val androidComponents = extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
+            androidComponents.onVariants { variant ->
+                val extension = AppVersioningExtension.getOrCreate(this)
+
+                // Make sure these are Providers so they evaluate late
+                val vName = providers.provider { extension.versionName }
+                val vCode = providers.provider { extension.versionCode }
+
+                variant.outputs.forEach { output ->
+                    output.versionName.set(vName)
+                    output.versionCode.set(vCode)
                 }
-                withDynamicFeaturePlugin {
-                    val extension = extension as AppVersioningExtension
-                    defaultConfig.versionName = extension.versionName
-                    defaultConfig.versionCode = extension.versionCode
-                    printInfo("Setting versionName to ${extension.versionName}")
-                    printInfo("Setting versionCode to ${extension.versionCode}")
-                }
-                withLibraryPlugin {
-                    val extension = extension as LibraryVersioningExtension
-                    version = extension.version
-                    printInfo("Setting library version to ${extension.version}")
-                }
+
+                printInfo("Setting versionName to ${extension.versionName}")
+                printInfo("Setting versionCode to ${extension.versionCode}")
             }
+        }
+        withDynamicFeaturePlugin {
+            // Intentionally no-op:
+            // Dynamic feature modules don't own versionName/versionCode.
+            // Versioning comes from the base application module.
+        }
+        withLibraryPlugin {
+            val androidComponents = extensions.getByType(LibraryAndroidComponentsExtension::class.java)
+            androidComponents.onVariants { variant ->
+                val extension = LibraryVersioningExtension.getOrCreate(this)
+                project.version = extension.version
+
+                printInfo("Setting library version to ${extension.version}")
+            }
+        }
+        withJavaPlatformPlugin {
+            val extension = LibraryVersioningExtension.getOrCreate(this)
+            version = extension.version
+
+            printInfo("Setting platform version to ${extension.version}")
         }
     }
 }

@@ -9,11 +9,10 @@ pluginManagement {
      * and the Maven Central Repository as the repositories Gradle should use to look for its dependencies.
      */
     repositories {
-        gradlePluginPortal()
         google()
-        jcenter()
         mavenCentral()
-        mavenLocal()
+        gradlePluginPortal()
+//        mavenLocal() // Only if is needed for local development
     }
 }
 
@@ -32,22 +31,23 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
-        jcenter()
         mavenCentral()
-        mavenLocal()
+        gradlePluginPortal()
     }
 }
 
 plugins {
-    id("com.gradle.enterprise") version "3.13.1"
+    id("com.gradle.develocity") version "4.3.2"
 }
 
-gradleEnterprise {
+val isCI = providers.environmentVariable("CI").isPresent
+
+develocity {
     buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
+        termsOfUseUrl = "https://gradle.com/terms-of-service"
+        termsOfUseAgree = "yes"
 
         // Publishing a build scan for every build execution
-        publishAlways()
+        publishing.onlyIf { isCI }
     }
 }

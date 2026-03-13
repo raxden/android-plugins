@@ -13,5 +13,8 @@ open class VersioningExtension @Inject constructor(
     }
 
     var filePath: String = DEFAULT_FILE_PATH
-    val fileVersionProvider by lazy { FileVersionProvider(filePath) }
+    val fileVersionProvider by lazy {
+        val resolved = project.file(filePath).absolutePath
+        FileVersionProvider(resolved)
+    }
 }

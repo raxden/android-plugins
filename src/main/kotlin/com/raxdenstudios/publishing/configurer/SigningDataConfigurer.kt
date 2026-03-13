@@ -1,13 +1,14 @@
-package com.raxdenstudios.publishing.provider
+package com.raxdenstudios.publishing.configurer
 
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.plugins.signing.SigningExtension
 
-class SigningDataProvider(
-    private val project: Project
-) : DataProvider(project) {
+class SigningDataConfigurer(
+    private val project: Project,
+    extensionName: String,
+) : PublishingConfigurer<SigningExtension>(project, extensionName) {
 
     private val Project.publishing: PublishingExtension
         get() = (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
@@ -40,11 +41,8 @@ class SigningDataProvider(
             }
         }
 
-    @Suppress("UnstableApiUsage")
-    fun configure(extension: SigningExtension) {
-        extension.run {
-            useInMemoryPgpKeys(keyId, key, password)
-            sign(project.publishing.publications)
-        }
+    override fun configure(data: SigningExtension): Unit = data.run {
+        useInMemoryPgpKeys(keyId, key, password)
+        sign(project.publishing.publications)
     }
 }

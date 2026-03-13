@@ -1,11 +1,12 @@
-package com.raxdenstudios.publishing.provider
+package com.raxdenstudios.publishing.configurer
 
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 
-class RepositoryDataProvider(
-    private val project: Project
-) : DataProvider(project) {
+class RepositoryDataConfigurer(
+    private val project: Project,
+    extensionName: String,
+) : PublishingConfigurer<PublishingExtension>(project, extensionName) {
 
     private val repository = extension.repository
     private val credentials = repository.credentials
@@ -30,16 +31,14 @@ class RepositoryDataProvider(
             }
         }
 
-    fun configure(extension: PublishingExtension) {
-        extension.run {
-            repositories {
-                maven {
-                    name = this@RepositoryDataProvider.name
-                    url = project.uri(this@RepositoryDataProvider.url)
-                    credentials {
-                        username = this@RepositoryDataProvider.username
-                        password = this@RepositoryDataProvider.password
-                    }
+    override fun configure(data: PublishingExtension) = data.run {
+        repositories {
+            maven {
+                name = this@RepositoryDataConfigurer.name
+                url = project.uri(this@RepositoryDataConfigurer.url)
+                credentials {
+                    username = this@RepositoryDataConfigurer.username
+                    password = this@RepositoryDataConfigurer.password
                 }
             }
         }

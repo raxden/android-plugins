@@ -1,8 +1,8 @@
 package com.raxdenstudios.versioning.extension
 
+import com.raxdenstudios.getOrCreateExtension
 import com.raxdenstudios.versioning.VersioningPlugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.create
 
 open class LibraryVersioningExtension(
     project: Project
@@ -13,7 +13,7 @@ open class LibraryVersioningExtension(
 
     companion object {
 
-        fun create(project: Project): LibraryVersioningExtension =
-            project.extensions.create(VersioningPlugin.EXTENSION_NAME)
+        fun getOrCreate(project: Project): LibraryVersioningExtension =
+            project.getOrCreateExtension(VersioningPlugin.EXTENSION_NAME)
     }
 }
