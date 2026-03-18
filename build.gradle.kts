@@ -21,7 +21,7 @@ gradlePlugin {
             displayName = "Gradle Versioning Plugin"
             description = "Gradle plugin to manage versioning of Android projects."
             tags.set(listOf("version", "android", "library"))
-            version = "0.57.29"
+            version = "0.57.30"
         }
         create("publishLibraryPlugin") {
             id = "com.raxdenstudios.android-publish-library"
@@ -29,15 +29,15 @@ gradlePlugin {
             displayName = "Gradle Publish Plugin"
             description = "Gradle plugin to publish Android libraries to Maven Central."
             tags.set(listOf("publishing", "maven", "android", "library", "aar"))
-            version = "0.57.29"
+            version = "0.57.30"
         }
         create("publishPlatformPlugin") {
-            id = "com.raxdenstudios.publish-platform"
+            id = "com.raxdenstudios.android-publish-platform"
             implementationClass = "com.raxdenstudios.publishing.PublishPlatformPlugin"
             displayName = "Gradle Publish Java Platform Plugin"
             description = "Gradle plugin to publish Java Platform/BOM modules with Maven Publish and Signing."
             tags.set(listOf("publishing", "maven", "bom", "platform", "java-platform"))
-            version = "0.57.29"
+            version = "0.57.30"
         }
     }
 }
