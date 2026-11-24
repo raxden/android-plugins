@@ -1,5 +1,10 @@
 package com.raxdenstudios.publishing.model
 
+/**
+ * Extra POM data. Its values take precedence over the `PublishExtension` properties: blank
+ * [name], [description] and [url], empty [developers] and blank [scm] fields fall back to them.
+ * `Pom.default` lists the Apache License 2.0 only.
+ */
 data class Pom(
     val name: String,
     val description: String,

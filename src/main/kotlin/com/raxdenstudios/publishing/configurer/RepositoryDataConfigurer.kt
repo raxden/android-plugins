@@ -1,44 +1,52 @@
 package com.raxdenstudios.publishing.configurer
 
+import com.raxdenstudios.gradlePropertyOrEnvironment
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 
+/**
+ * Adds the remote Maven repository configured in the extension. Nothing is added when its url is
+ * blank (the default): Maven Central Portal tooling such as NMCP consumes the publications
+ * directly. Must run once the build script has been evaluated.
+ *
+ * Blank credentials fall back to the `OSSRH_USERNAME` / `OSSRH_PASSWORD` Gradle properties and then
+ * to the environment variables with the same names. Credentials are set only when at least one of
+ * them is not blank.
+ */
 class RepositoryDataConfigurer(
     private val project: Project,
     extensionName: String,
 ) : PublishingConfigurer<PublishingExtension>(project, extensionName) {
 
-    private val repository = extension.repository
-    private val credentials = repository.credentials
-    private val name: String = repository.name
-    private val url: String = repository.url
-    private val username: String
-        get() {
-            return when {
-                credentials.username.isNotEmpty() -> credentials.username
-                project.properties["OSSRH_USERNAME"] != null -> project.properties["OSSRH_USERNAME"] as String
-                System.getenv("OSSRH_USERNAME") != null -> System.getenv("OSSRH_USERNAME")
-                else -> ""
-            }
-        }
-    private val password: String
-        get() {
-            return when {
-                credentials.password.isNotEmpty() -> credentials.password
-                project.properties["OSSRH_PASSWORD"] != null -> project.properties["OSSRH_PASSWORD"] as String
-                System.getenv("OSSRH_PASSWORD") != null -> System.getenv("OSSRH_PASSWORD")
-                else -> ""
-            }
-        }
+    companion object {
+        private const val USERNAME_KEY = "OSSRH_USERNAME"
+        private const val PASSWORD_KEY = "OSSRH_PASSWORD"
+    }
 
-    override fun configure(data: PublishingExtension) = data.run {
-        repositories {
-            maven {
-                name = this@RepositoryDataConfigurer.name
-                url = project.uri(this@RepositoryDataConfigurer.url)
+    private val repository
+        get() = extension.repository.get()
+
+    private val username: String
+        get() = repository.credentials.username
+            .ifBlank { project.gradlePropertyOrEnvironment(USERNAME_KEY).orNull.orEmpty() }
+
+    private val password: String
+        get() = repository.credentials.password
+            .ifBlank { project.gradlePropertyOrEnvironment(PASSWORD_KEY).orNull.orEmpty() }
+
+    override fun configure(data: PublishingExtension) {
+        val repository = repository
+        if (repository.url.isBlank()) return
+
+        val username = username
+        val password = password
+        data.repositories.maven {
+            if (repository.name.isNotBlank()) name = repository.name
+            url = project.uri(repository.url)
+            if (username.isNotBlank() || password.isNotBlank()) {
                 credentials {
-                    username = this@RepositoryDataConfigurer.username
-                    password = this@RepositoryDataConfigurer.password
+                    this.username = username
+                    this.password = password
                 }
             }
         }

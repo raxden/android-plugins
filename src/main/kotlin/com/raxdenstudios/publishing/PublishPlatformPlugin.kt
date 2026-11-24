@@ -1,94 +1,56 @@
 package com.raxdenstudios.publishing
 
-import com.raxdenstudios.Plugin.MavenPublish
-import com.raxdenstudios.Plugin.Signing
-import com.raxdenstudios.checkPlatformPlugin
-import com.raxdenstudios.getOrCreateExtension
-import com.raxdenstudios.publishing.configurer.CoordinatesDataConfigurer
-import com.raxdenstudios.publishing.configurer.PomDataConfigurer
-import com.raxdenstudios.publishing.configurer.RepositoryDataConfigurer
-import com.raxdenstudios.publishing.configurer.SigningDataConfigurer
-import com.raxdenstudios.publishing.extension.PublishExtension
-import com.raxdenstudios.withJavaPlatformPlugin
-import com.raxdenstudios.withMavenPublishPlugin
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.register
-import org.gradle.plugins.signing.SigningExtension
-
-open class PublishPlatformPlugin : Plugin<Project> {
+/**
+ * Publishes a Java Platform / BOM module (`java-platform`) to Maven as the `platform` publication.
+ * `java-platform` must be applied to the same project (plugin order does not matter); this plugin
+ * does not apply it for you.
+ *
+ * Configure the publication with the `publishPlatform` extension (see [PublishExtension]).
+ *
+ * ## Setup
+ *
+ * ```kotlin
+ * // build.gradle.kts of the BOM module
+ * plugins {
+ *     id("java-platform")
+ *     id("com.raxdenstudios.android-publish-platform")
+ * }
+ * ```
+ *
+ * ## Usage
+ *
+ * ```kotlin
+ * import com.raxdenstudios.publishing.model.Coordinates
+ * import com.raxdenstudios.publishing.model.Developer
+ *
+ * group = "com.raxdenstudios"
+ * version = "1.0.0"
+ *
+ * publishPlatform {
+ *     name = "My BOM"
+ *     description = "Versions of the library modules"
+ *     url = "https://github.com/owner/repo"
+ *     developer = Developer(id = "owner", name = "Owner", email = "owner@example.com")
+ *     coordinates = Coordinates.default.copy(artifactId = "my-bom")
+ * }
+ * ```
+ *
+ * `./gradlew publishToMavenLocal` works without signing keys. Publishing to a remote repository
+ * requires signing keys (see [SigningDataConfigurer]).
+ */
+open class PublishPlatformPlugin : AbstractPublishPlugin() {
 
     companion object {
         const val EXTENSION_NAME = "publishPlatform"
+        private const val PLUGIN_ID = "com.raxdenstudios.android-publish-platform"
+        private const val JAVA_PLATFORM_PLUGIN_ID = "java-platform"
         private const val PUBLICATION_NAME = "platform"
         private const val JAVA_PLATFORM_COMPONENT_NAME = "javaPlatform"
     }
 
-    override fun apply(project: Project) = with(project) {
-        checkPlatformPlugin()
-        initRequiredPlugins()
-        initExtension()
-        configure()
-    }
-
-    private fun Project.initRequiredPlugins() {
-        plugins.apply(MavenPublish.id)
-        plugins.apply(Signing.id)
-    }
-
-    private fun Project.initExtension() {
-        getOrCreateExtension<PublishExtension>(EXTENSION_NAME)
-    }
-
-    private fun Project.configure() {
-        configurePublication()
-        configureSigning()
-    }
-
-    private fun Project.configurePublication() {
-        withMavenPublishPlugin {
-            withJavaPlatformPlugin {
-                afterEvaluate {
-                    val publishing = extensions.getByType<PublishingExtension>()
-
-                    if (PUBLICATION_NAME !in publishing.publications.names) {
-                        publishing.publications.register<MavenPublication>(PUBLICATION_NAME) {
-                            from(components.getByName(JAVA_PLATFORM_COMPONENT_NAME))
-
-                            configureCoordinates(project)
-                            configurePom(project)
-                        }
-                    }
-
-                    publishing.configureRepositories(project)
-                }
-            }
-        }
-    }
-
-    private fun Project.configureSigning() {
-        extensions.configure<SigningExtension> {
-            configureSigningExtension(project)
-        }
-    }
-
-    private fun SigningExtension.configureSigningExtension(project: Project) {
-        SigningDataConfigurer(project, EXTENSION_NAME).configure(this)
-    }
-
-    private fun MavenPublication.configureCoordinates(project: Project) {
-        CoordinatesDataConfigurer(project, EXTENSION_NAME).configure(this)
-    }
-
-    private fun PublishingExtension.configureRepositories(project: Project) {
-        RepositoryDataConfigurer(project, EXTENSION_NAME).configure(this)
-    }
-
-    private fun MavenPublication.configurePom(project: Project) {
-        PomDataConfigurer(project, EXTENSION_NAME).configure(this)
-    }
+    override val pluginId = PLUGIN_ID
+    override val extensionName = EXTENSION_NAME
+    override val requiredPluginId = JAVA_PLATFORM_PLUGIN_ID
+    override val componentName = JAVA_PLATFORM_COMPONENT_NAME
+    override val publicationName = PUBLICATION_NAME
 }

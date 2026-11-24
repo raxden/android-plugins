@@ -1,21 +1,20 @@
 package com.raxdenstudios.publishing.configurer
 
 import com.android.build.api.dsl.LibraryExtension
-import org.gradle.api.Project
 
-class ArtifactsConfigurer(
-    project: Project,
-    extensionName: String,
-) : PublishingConfigurer<LibraryExtension>(project, extensionName) {
+/** Publishes the `release` variant of an Android library with sources and javadoc jars. */
+class ArtifactsConfigurer {
 
     companion object {
         private const val RELEASE = "release"
     }
 
-    override fun configure(data: LibraryExtension) = data.run {
+    /** Declares the `release` variant as a single publishing variant, with sources and javadoc jars. */
+    fun configure(data: LibraryExtension) = data.run {
         publishing {
             singleVariant(RELEASE) {
                 withSourcesJar()
+                withJavadocJar()
             }
         }
     }
