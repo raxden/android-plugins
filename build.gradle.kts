@@ -69,6 +69,7 @@ dependencies {
 
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test"))
+    testImplementation("org.bouncycastle:bcpg-jdk18on:1.87") // throwaway PGP keys for signing tests
     testImplementation(platform("org.junit:junit-bom:5.14.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
