@@ -1,3 +1,5 @@
+rootProject.name = "android-plugins"
+
 pluginManagement {
     /**
      * The pluginManagement {repositories {...}} block configures the
