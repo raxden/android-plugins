@@ -1,13 +1,26 @@
 plugins {
     `kotlin-dsl`
-    id("groovy")
     id("com.gradle.plugin-publish") version "2.0.0" // https://plugins.gradle.org/docs/publish-plugin
 }
 
-group = "com.raxdenstudios"
-version = "1.0.0-SNAPSHOT"
-
 // to publish -> gradlew publishPlugins
+
+val pluginVersion = "0.57.30"
+
+group = "com.raxdenstudios"
+version = pluginVersion
+
+val agpDependency = "com.android.tools.build:gradle:9.1.0"
+
+/*
+ * AGP is applied by consumers, so it is compileOnly here to avoid forcing its version onto their
+ * buildscript classpath. TestKit fixtures still need it: it is injected only into the
+ * plugin-under-test classpath used by GradleRunner.withPluginClasspath().
+ */
+val testPluginClasspath: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
 
 gradlePlugin {
 
@@ -21,7 +34,7 @@ gradlePlugin {
             displayName = "Gradle Versioning Plugin"
             description = "Gradle plugin to manage versioning of Android projects."
             tags.set(listOf("version", "android", "library"))
-            version = "0.57.30"
+            version = pluginVersion
         }
         create("publishLibraryPlugin") {
             id = "com.raxdenstudios.android-publish-library"
@@ -29,7 +42,7 @@ gradlePlugin {
             displayName = "Gradle Publish Plugin"
             description = "Gradle plugin to publish Android libraries to Maven Central."
             tags.set(listOf("publishing", "maven", "android", "library", "aar"))
-            version = "0.57.30"
+            version = pluginVersion
         }
         create("publishPlatformPlugin") {
             id = "com.raxdenstudios.android-publish-platform"
@@ -37,32 +50,28 @@ gradlePlugin {
             displayName = "Gradle Publish Java Platform Plugin"
             description = "Gradle plugin to publish Java Platform/BOM modules with Maven Publish and Signing."
             tags.set(listOf("publishing", "maven", "bom", "platform", "java-platform"))
-            version = "0.57.30"
+            version = pluginVersion
         }
     }
+}
+
+tasks.pluginUnderTestMetadata {
+    pluginClasspath.from(testPluginClasspath)
 }
 
 tasks.test {
     useJUnitPlatform()
 }
 
-// to publish -> gradlew publishPlugins
-
 dependencies {
-    /* Depend on the android gradle plugin, since we want to access it in our plugin */
-    implementation("com.android.tools.build:gradle:9.1.0")
-
-    /* Depend on the kotlin plugin, since we want to access it in our plugin */
-    implementation(kotlin("gradle-plugin", version = "2.3.10"))
+    compileOnly(agpDependency)
+    testPluginClasspath(agpDependency)
 
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test"))
-    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation(platform("org.junit:junit-bom:5.14.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-
-    /* Depend on the default Gradle API's since we want to build a custom plugin */
-//    implementation(gradleApi())
-//    implementation(localGroovy())
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {
