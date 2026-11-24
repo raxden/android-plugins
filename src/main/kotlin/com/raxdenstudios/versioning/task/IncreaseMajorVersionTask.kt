@@ -1,27 +1,17 @@
 package com.raxdenstudios.versioning.task
 
-import com.raxdenstudios.versioning.VersioningPlugin
-import com.raxdenstudios.versioning.provider.FileVersionProvider
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.register
+import com.raxdenstudios.versioning.version.VersionPart
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.UntrackedTask
 
-open class IncreaseMajorVersionTask : AbstractIncreaseVersionTask() {
+/** Increases MAJOR by one and resets MINOR, PATCH and DEV to 0. */
+@UntrackedTask(because = "Rewrites the version file in place on every run")
+abstract class IncreaseMajorVersionTask : AbstractIncreaseVersionTask() {
 
-    override fun FileVersionProvider.increaseVersion() {
-        increaseMajorVersion()
-        resetMinorVersion()
-        resetPatchVersion()
-        resetDevVersion()
-    }
+    @get:Internal
+    override val part: VersionPart = VersionPart.MAJOR
 
     companion object {
-
-        private const val TASK_NAME = "increaseMajorVersion"
-
-        fun register(project: Project) {
-            project.tasks.register<IncreaseMajorVersionTask>(TASK_NAME) {
-                group = VersioningPlugin.GROUP_TASK_NAME
-            }
-        }
+        const val TASK_NAME = "increaseMajorVersion"
     }
 }

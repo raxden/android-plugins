@@ -18,9 +18,9 @@ object GradleTestKit {
         .withPluginClasspath()
         .forwardOutput()
 
-    fun assertTaskSucceeded(result: BuildResult, task: String) {
-        val task = result.task(task)
-        assertNotNull(task, "Task '$task' was not found in the build result.")
-        assertEquals(TaskOutcome.SUCCESS, task.outcome)
+    fun assertTaskSucceeded(result: BuildResult, taskPath: String) {
+        val task = result.task(taskPath)
+        assertNotNull(task, "Task '$taskPath' was not found in the build result.")
+        assertEquals(TaskOutcome.SUCCESS, task.outcome, "Task '$taskPath' did not succeed.")
     }
 }
