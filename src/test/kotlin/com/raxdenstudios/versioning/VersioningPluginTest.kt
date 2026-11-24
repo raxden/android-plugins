@@ -169,6 +169,55 @@ class VersioningPluginTest {
     }
 
     @Test
+    fun `Given an android library When printing the project version Then it is the file version name`() {
+        val project = VersioningTestProject(testProjectDir)
+        project.settings("lib")
+        project.rootBuild(android = true)
+        project.libraryModule(
+            "lib",
+            filePath = "../version.properties",
+            extraScript = "tasks.register(\"printProjectVersion\") { doLast { println(\"PROJECT_VERSION=\" + project.version) } }",
+        )
+        project.versionFile("version.properties")
+
+        val result = GradleTestKit.runner(testProjectDir, "-q", ":lib:printProjectVersion").build()
+
+        assertContains(result.output, "PROJECT_VERSION=1.3.4")
+    }
+
+    @Test
+    fun `Given a dynamic feature module When listing tasks Then versioning tasks exist and nothing crashes`() {
+        val project = VersioningTestProject(testProjectDir)
+        project.settings("app", "dynamic")
+        project.rootBuild(android = true)
+        project.appModule("app", filePath = "../version.properties", extraScript = "android { dynamicFeatures += \":dynamic\" }")
+        project.dynamicFeatureModule("dynamic", filePath = "../version.properties")
+        project.versionFile("version.properties")
+
+        val result = GradleTestKit.runner(testProjectDir, ":dynamic:tasks", "--all").build()
+
+        assertContains(result.output, "increasePatchVersion")
+        assertContains(result.output, "getVersion")
+        assertContains(result.output, "showVersionInfo")
+    }
+
+    @Test
+    fun `Given a dynamic feature module When getVersion and increasePatchVersion run Then they use the file`() {
+        val project = VersioningTestProject(testProjectDir)
+        project.settings("app", "dynamic")
+        project.rootBuild(android = true)
+        project.appModule("app", filePath = "../version.properties", extraScript = "android { dynamicFeatures += \":dynamic\" }")
+        project.dynamicFeatureModule("dynamic", filePath = "../version.properties")
+        project.versionFile("version.properties")
+
+        val version = GradleTestKit.runner(testProjectDir, "-q", ":dynamic:getVersion").build()
+        GradleTestKit.runner(testProjectDir, ":dynamic:increasePatchVersion").build()
+
+        assertEquals("1.3.4", version.output.lines().last { it.isNotBlank() })
+        assertEquals(listOf("MAJOR=1", "MINOR=3", "PATCH=5", "DEV=0"), project.readLines("version.properties"))
+    }
+
+    @Test
     fun `Given a missing version file When getVersion runs Then it fails with a clear message`() {
         val project = VersioningTestProject(testProjectDir)
         project.settings("platform")
@@ -219,5 +268,34 @@ class VersioningPluginTest {
 
         assertContains(result.output, "none of")
         assertContains(result.output, "versioning tasks are not registered")
+    }
+
+    @Test
+    fun `Given an app module When the main manifest is processed Then version name and code come from the file`() {
+        val project = VersioningTestProject(testProjectDir)
+        project.settings("app")
+        project.rootBuild(android = true)
+        project.appModule("app", filePath = "../version.properties")
+        project.versionFile("version.properties")
+        project.write("local.properties", "sdk.dir=${androidSdkDir()}")
+
+        GradleTestKit.runner(testProjectDir, ":app:processDebugMainManifest").build()
+
+        val manifest = project.file("app/build/intermediates").walkTopDown()
+            .first { it.name == "AndroidManifest.xml" && it.path.contains("merged_manifest") }
+            .readText()
+        assertContains(manifest, "android:versionName=\"1.3.4\"")
+        assertContains(manifest, "android:versionCode=\"1030402\"")
+    }
+
+    private fun androidSdkDir(): String {
+        val sdk = listOfNotNull(
+            System.getenv("ANDROID_HOME"),
+            System.getenv("ANDROID_SDK_ROOT"),
+            System.getProperty("user.home") + "/Library/Android/sdk",
+            System.getProperty("user.home") + "/Android/Sdk",
+        ).firstOrNull { path -> java.io.File(path).isDirectory }
+        org.junit.jupiter.api.Assumptions.assumeTrue(sdk != null, "Android SDK not found: skipping.")
+        return sdk!!
     }
 }

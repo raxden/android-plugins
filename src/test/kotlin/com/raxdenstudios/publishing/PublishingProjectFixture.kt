@@ -14,7 +14,11 @@ internal class PublishingProjectFixture(private val root: Path) {
     val localMavenDir: File get() = root.resolve("local-m2").toFile()
     val customRepoDir: File get() = root.resolve("custom-repo").toFile()
 
-    fun writeSettings() {
+    /**
+     * Writes settings and root files. With [includeLibrary] `false` only `:bom` is included and no
+     * Android SDK is needed, which keeps the build fast.
+     */
+    fun writeSettings(includeLibrary: Boolean = true) {
         write(
             "settings.gradle.kts",
             """
@@ -25,14 +29,22 @@ internal class PublishingProjectFixture(private val root: Path) {
                     mavenCentral()
                 }
             }
-            include(":lib", ":bom")
+            include(${if (includeLibrary) "\":lib\", " else ""}":bom")
             """.trimIndent()
         )
         write("build.gradle.kts", "")
-        val sdkDir = androidSdkDir()
-        assumeTrue(sdkDir != null, "Android SDK not found (set ANDROID_HOME or ANDROID_SDK_ROOT): skipping.")
-        write("local.properties", "sdk.dir=$sdkDir")
-        write("gradle.properties", "android.useAndroidX=true\n")
+        if (includeLibrary) {
+            val sdkDir = androidSdkDir()
+            assumeTrue(sdkDir != null, "Android SDK not found (set ANDROID_HOME or ANDROID_SDK_ROOT): skipping.")
+            write("local.properties", "sdk.dir=$sdkDir")
+            write("gradle.properties", "android.useAndroidX=true\n")
+        }
+    }
+
+    /** Writes [content] to [relativePath] below the project root. */
+    fun writeFile(relativePath: String, content: String): File {
+        write(relativePath, content)
+        return root.resolve(relativePath).toFile()
     }
 
     fun writeLibrary(
@@ -68,15 +80,19 @@ internal class PublishingProjectFixture(private val root: Path) {
     fun writePlatform(
         publishBlock: String = DEFAULT_PLATFORM_PUBLISH,
         projectConfig: String = "",
+        extraPlugins: String = "",
     ) {
         write(
             "bom/build.gradle.kts",
             """
             import com.raxdenstudios.publishing.model.*
+            import com.raxdenstudios.publishing.model.Credentials
+            import com.raxdenstudios.publishing.model.Repository
 
             plugins {
                 id("java-platform")
                 id("com.raxdenstudios.android-publish-platform")
+                $extraPlugins
             }
 
             $projectConfig
@@ -92,20 +108,18 @@ internal class PublishingProjectFixture(private val root: Path) {
         runner(configurationCache = true, *arguments)
 
     private fun runner(configurationCache: Boolean, vararg arguments: String): GradleRunner {
-        val environment = System.getenv().filterKeys { key ->
-            key !in setOf("SIGNING_KEY", "SIGNING_KEY_ID", "SIGNING_PASSWORD", "OSSRH_USERNAME", "OSSRH_PASSWORD")
-        }
+        val environment = System.getenv().filterKeys { key -> key !in SECRET_KEYS }
+        // The user's gradle.properties may define real keys: command line values win. A key the
+        // test passes itself is not blanked, since an empty -P value would still count as present.
+        val blanking = SECRET_KEYS
+            .filter { key -> arguments.none { argument -> argument.startsWith("-P$key=") } }
+            .map { key -> "-P$key=" }
         return GradleTestKit.runner(
             root,
             *arguments,
             if (configurationCache) "--configuration-cache" else "--no-configuration-cache",
             "--stacktrace",
-            // The user's gradle.properties may define real keys: command line values win.
-            "-PSIGNING_KEY=",
-            "-PSIGNING_KEY_ID=",
-            "-PSIGNING_PASSWORD=",
-            "-POSSRH_USERNAME=",
-            "-POSSRH_PASSWORD=",
+            *blanking.toTypedArray(),
         ).withEnvironment(environment)
     }
 
@@ -123,6 +137,9 @@ internal class PublishingProjectFixture(private val root: Path) {
     ).firstOrNull { path -> File(path).isDirectory }
 
     companion object {
+        private val SECRET_KEYS =
+            listOf("SIGNING_KEY", "SIGNING_KEY_ID", "SIGNING_PASSWORD", "OSSRH_USERNAME", "OSSRH_PASSWORD")
+
         const val LIBRARY_PLUGINS = """
     id("com.android.library")
     id("com.raxdenstudios.android-publish-library")

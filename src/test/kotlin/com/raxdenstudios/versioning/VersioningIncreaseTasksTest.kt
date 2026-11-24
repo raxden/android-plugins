@@ -115,6 +115,22 @@ class VersioningIncreaseTasksTest {
         assertContains(result.output, "was already increased in this build")
     }
 
+    @Test
+    fun `Given two modules sharing one file When increasePatchVersion runs in parallel Then the file is bumped once`() {
+        project.settings("platform1", "platform2")
+        project.rootBuild(android = false)
+        project.platformModule("platform1", filePath = "../version.properties")
+        project.platformModule("platform2", filePath = "../version.properties")
+        project.versionFile("version.properties")
+
+        val result = GradleTestKit.runner(testProjectDir, "increasePatchVersion", "--parallel").build()
+
+        GradleTestKit.assertTaskSucceeded(result, ":platform1:increasePatchVersion")
+        GradleTestKit.assertTaskSucceeded(result, ":platform2:increasePatchVersion")
+        assertEquals(listOf("MAJOR=1", "MINOR=3", "PATCH=5", "DEV=0"), project.readLines("version.properties"))
+        assertEquals(1, Regex("was already increased in this build").findAll(result.output).count())
+    }
+
     private val minorThenPatch = listOf("MAJOR=1", "MINOR=4", "PATCH=1", "DEV=0")
 
     @Test

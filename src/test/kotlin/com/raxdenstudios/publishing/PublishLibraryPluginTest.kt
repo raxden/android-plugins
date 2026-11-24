@@ -308,6 +308,22 @@ internal class PublishLibraryPluginTest {
         assertFalse(second.output.contains("problem"), second.output)
     }
 
+    @Test
+    fun `Given the versioning plugin and no explicit version When generating the pom Then it uses the file version`() {
+        fixture.writeSettings()
+        fixture.writeLibrary(
+            pluginsBlock = PublishingProjectFixture.LIBRARY_PLUGINS +
+                "    id(\"com.raxdenstudios.android-versioning\")\n",
+            publishBlock = PublishingProjectFixture.DEFAULT_LIBRARY_PUBLISH.replace("""version = "1.2.3"""", ""),
+        )
+        fixture.writePlatform()
+        fixture.writeFile("lib/version.properties", "MAJOR=2\nMINOR=0\nPATCH=7\nDEV=0\n")
+
+        fixture.runner(":lib:generatePomFileForReleasePublication").build()
+
+        assertContains(pomOf(fixture.libDir, "release"), "<version>2.0.7</version>")
+    }
+
     private fun withCustomRepository(
         credentials: String = "Credentials.default",
     ): String =

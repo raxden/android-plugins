@@ -96,4 +96,50 @@ internal class VersioningTestProject(private val root: Path) {
         )
         write("$name/src/main/AndroidManifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest />\n")
     }
+
+    fun libraryModule(name: String, filePath: String, extraScript: String = "") {
+        write(
+            "$name/build.gradle.kts",
+            """
+            plugins {
+                id("com.android.library")
+                id("com.raxdenstudios.android-versioning")
+            }
+
+            versioning { filePath = "$filePath" }
+
+            android {
+                namespace = "com.example.$name"
+                compileSdk = 34
+                defaultConfig { minSdk = 24 }
+            }
+
+            $extraScript
+            """.trimIndent()
+        )
+        write("$name/src/main/AndroidManifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest />\n")
+    }
+
+    fun dynamicFeatureModule(name: String, filePath: String, extraScript: String = "") {
+        write(
+            "$name/build.gradle.kts",
+            """
+            plugins {
+                id("com.android.dynamic-feature")
+                id("com.raxdenstudios.android-versioning")
+            }
+
+            versioning { filePath = "$filePath" }
+
+            android {
+                namespace = "com.example.$name"
+                compileSdk = 34
+                defaultConfig { minSdk = 24 }
+            }
+
+            $extraScript
+            """.trimIndent()
+        )
+        write("$name/src/main/AndroidManifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest />\n")
+    }
 }
