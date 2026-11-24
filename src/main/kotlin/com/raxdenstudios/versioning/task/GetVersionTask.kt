@@ -1,38 +1,29 @@
 package com.raxdenstudios.versioning.task
 
-import com.raxdenstudios.extensionByName
-import com.raxdenstudios.versioning.VersioningPlugin
-import com.raxdenstudios.versioning.extension.AppVersioningExtension
-import com.raxdenstudios.versioning.extension.LibraryVersioningExtension
-import com.raxdenstudios.versioning.extension.VersioningExtension
+import com.raxdenstudios.versioning.version.VersionFile
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.register
+import org.gradle.work.DisableCachingByDefault
 
-open class GetVersionTask : DefaultTask() {
+/**
+ * Prints only the version name to stdout, so CI can read it with `./gradlew -q getVersion | tail -n 1`.
+ */
+@DisableCachingByDefault(because = "Only prints the version")
+abstract class GetVersionTask : DefaultTask() {
 
-    private val extension: VersioningExtension by lazy {
-        project.extensionByName(VersioningPlugin.EXTENSION_NAME)!!
-    }
+    // Internal so a missing file reaches VersionFile's message instead of Gradle's input
+    // validation; these tasks have no outputs, so they are never up-to-date anyway.
+    @get:Internal
+    abstract val versionFile: RegularFileProperty
 
     @TaskAction
     fun execute() {
-        when (val extension = extension) {
-            is AppVersioningExtension -> println(extension.versionName)
-            is LibraryVersioningExtension -> println(extension.version)
-            else -> error("Versioning extension not supported")
-        }
+        println(VersionFile.read(versionFile.get().asFile).versionName)
     }
 
     companion object {
-
-        private const val TASK_NAME = "getVersion"
-
-        fun register(project: Project) {
-            project.tasks.register<GetVersionTask>(TASK_NAME) {
-                group = VersioningPlugin.GROUP_TASK_NAME
-            }
-        }
+        const val TASK_NAME = "getVersion"
     }
 }
